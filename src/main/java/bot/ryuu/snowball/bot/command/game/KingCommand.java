@@ -1,9 +1,6 @@
 package bot.ryuu.snowball.bot.command.game;
 
 import bot.ryuu.snowball.bot.command.AbstractCommand;
-import bot.ryuu.snowball.game.EventAction;
-import bot.ryuu.snowball.game.TimeStamp;
-import bot.ryuu.snowball.game.power.Power;
 import bot.ryuu.snowball.player.Player;
 import bot.ryuu.snowball.player.PlayerRepository;
 import bot.ryuu.snowball.theme.ThemeEmoji;
@@ -17,40 +14,35 @@ import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionE
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-import java.util.Optional;
+import java.util.Collections;
+import java.util.List;
 
-@Getter
 @Setter
-public class RandomCommand extends AbstractCommand {
+@Getter
+public class KingCommand extends AbstractCommand {
     private PlayerRepository playerRepository;
 
-    public RandomCommand(PlayerRepository playerRepository) {
+    public KingCommand(PlayerRepository playerRepository) {
         super(playerRepository);
 
-        setCode("_random");
-        setCommandData(Commands.slash("random", "random object of power")
+        setCode("_kind_command");
+        setCommandData(Commands.slash("kind", "King snowball of this server")
                 .setGuildOnly(true));
 
-        this.playerRepository = playerRepository;
+        setPlayerRepository(playerRepository);
     }
 
     @Override
     protected void slashCommandInteraction(SlashCommandInteractionEvent event) {
-        Optional<Player> player = playerRepository.findById(event.getUser().getId());
+        List<Player> players = playerRepository.findAllByServer(event.getGuild().getId());
 
-        if (player.isPresent()) {
-            Power power = EventAction.randomPower(player.get());
-
-            if (power != null)
-                event.deferReply(true).setEmbeds(
-                        power.info()
-                ).queue();
-            else
-                event.deferReply(true).setEmbeds(
-                        ThemeMessage.getMainEmbed()
-                                .setDescription("You can only get the next item after " +
-                                        TimeStamp.TIMESTAMP_RANDOM_POWER + " minutes").build()
-                ).queue();
+        if (players.size() > 0) {
+            Collections.sort(players);
+            event.deferReply(true).setEmbeds(
+                    ThemeMessage.getMainEmbed()
+                            .setDescription(ThemeEmoji.KING.getEmoji().getAsMention() +
+                                    " The snowball king of this server is <@" + players.get(0).getId() + ">").build()
+            ).queue();
         } else
             event.deferReply(true).setEmbeds(
                     ThemeMessage.getErrorEmbed()

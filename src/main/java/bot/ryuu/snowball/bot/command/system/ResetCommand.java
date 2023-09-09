@@ -1,12 +1,8 @@
-package bot.ryuu.snowball.bot.command.game;
+package bot.ryuu.snowball.bot.command.system;
 
 import bot.ryuu.snowball.bot.command.AbstractCommand;
-import bot.ryuu.snowball.game.EventAction;
-import bot.ryuu.snowball.game.TimeStamp;
-import bot.ryuu.snowball.game.power.Power;
 import bot.ryuu.snowball.player.Player;
 import bot.ryuu.snowball.player.PlayerRepository;
-import bot.ryuu.snowball.theme.ThemeEmoji;
 import bot.ryuu.snowball.theme.ThemeMessage;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,44 +13,45 @@ import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionE
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
+import java.util.List;
 import java.util.Optional;
 
-@Getter
 @Setter
-public class RandomCommand extends AbstractCommand {
+@Getter
+public class ResetCommand extends AbstractCommand {
     private PlayerRepository playerRepository;
 
-    public RandomCommand(PlayerRepository playerRepository) {
+    public ResetCommand(PlayerRepository playerRepository) {
         super(playerRepository);
 
-        setCode("_random");
-        setCommandData(Commands.slash("random", "random object of power")
+        setCode("_reset_command");
+        setCommandData(Commands.slash("reset", "resets all users")
                 .setGuildOnly(true));
 
-        this.playerRepository = playerRepository;
+        setPlayerRepository(playerRepository);
     }
 
     @Override
     protected void slashCommandInteraction(SlashCommandInteractionEvent event) {
-        Optional<Player> player = playerRepository.findById(event.getUser().getId());
+        if (event.getGuild().getOwner().equals(event.getUser())) {
+            List<Player> players = playerRepository.findAllByServer(event.getGuild().getId());
 
-        if (player.isPresent()) {
-            Power power = EventAction.randomPower(player.get());
+            players.forEach(player -> {
+                player.setScore(0);
+                player.setLevel(0);
+                player.setSnowballAmount(0);
+            });
 
-            if (power != null)
-                event.deferReply(true).setEmbeds(
-                        power.info()
-                ).queue();
-            else
-                event.deferReply(true).setEmbeds(
-                        ThemeMessage.getMainEmbed()
-                                .setDescription("You can only get the next item after " +
-                                        TimeStamp.TIMESTAMP_RANDOM_POWER + " minutes").build()
-                ).queue();
+            playerRepository.saveAll(players);
+
+            event.deferReply(true).setEmbeds(
+                    ThemeMessage.getMainEmbed()
+                            .setDescription("User data has been reset").build()
+            ).queue();
         } else
             event.deferReply(true).setEmbeds(
-                    ThemeMessage.getErrorEmbed()
-                            .setDescription(ThemeEmoji.ERROR.getEmoji().getAsMention() + " error occurred").build()
+                    ThemeMessage.getMainEmbed()
+                            .setDescription("You have insufficient rights or an error has occurred").build()
             ).queue();
     }
 

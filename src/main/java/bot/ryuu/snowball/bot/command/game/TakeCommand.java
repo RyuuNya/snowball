@@ -4,6 +4,7 @@ import bot.ryuu.snowball.bot.command.AbstractCommand;
 import bot.ryuu.snowball.game.Event;
 import bot.ryuu.snowball.game.EventAction;
 import bot.ryuu.snowball.game.PowerSystem;
+import bot.ryuu.snowball.game.TimeStamp;
 import bot.ryuu.snowball.game.power.Power;
 import bot.ryuu.snowball.player.Player;
 import bot.ryuu.snowball.player.PlayerRepository;
@@ -85,6 +86,8 @@ public class TakeCommand extends AbstractCommand {
             case TAKE_SNOWBALL -> message = "You picked up one snowball";
             case TAKE_SNOWBALL_BIG_BAGS -> message = "You picked up 3 snowballs";
             case TAKE_SNOWBALL_THIEF -> message = "you stole half the snowballs from a player";
+            case TIMER_OVER -> message = "you've already taken a snowball, wait " +
+                    TimeStamp.TIMESTAMP_TAKE_SNOWBALL + " minutes to take another one";
         }
 
         event.deferReply(true).setEmbeds(

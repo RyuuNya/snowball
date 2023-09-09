@@ -1,8 +1,12 @@
 package bot.ryuu.snowball.bot;
 
+import bot.ryuu.snowball.SnowballApplication;
 import bot.ryuu.snowball.bot.command.AbstractCommand;
 import bot.ryuu.snowball.bot.command.game.*;
+import bot.ryuu.snowball.bot.command.system.HelpCommand;
+import bot.ryuu.snowball.bot.command.system.ResetCommand;
 import bot.ryuu.snowball.bot.listener.GameCommandListener;
+import bot.ryuu.snowball.bot.listener.SystemListener;
 import bot.ryuu.snowball.player.Player;
 import bot.ryuu.snowball.player.PlayerRepository;
 import net.dv8tion.jda.api.JDA;
@@ -21,7 +25,7 @@ import java.util.List;
 
 @Service
 public class Bot {
-    private static final String token = "MTE0NzU0OTE4OTM0MTk4NjgzNg.Gsqxk6.xMVVTwy3HPHRWF5bCcF5Ryd9oMnb88xXov239E";
+    private static final String token = SnowballApplication.getToken();
 
     private final PlayerRepository playerRepository;
 
@@ -36,7 +40,11 @@ public class Bot {
             new StatisticCommand(playerRepository),
             new RandomCommand(playerRepository),
             new RatingCommand(playerRepository),
-            new KindCommand(playerRepository)
+            new KingCommand(playerRepository),
+            new PowersCommand(playerRepository),
+
+            new ResetCommand(playerRepository),
+            new HelpCommand(playerRepository)
         );
     }
 
@@ -51,6 +59,7 @@ public class Bot {
         JDABuilder.createDefault(token)
                 .setStatus(OnlineStatus.ONLINE)
                 .addEventListeners(new GameCommandListener(commands))
+                .addEventListeners(new SystemListener(playerRepository))
                 .setActivity(Activity.playing("snowball"))
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .build().awaitReady();
@@ -78,8 +87,8 @@ public class Bot {
                         .server(guild.getId())
                         .objectPowerSet(new HashSet<>())
                         .snowballAmount(0)
-                        .lastRandomObjectPower(LocalDateTime.now().minusMinutes(10))
-                        .lastTakeSnowball(LocalDateTime.now().minusMinutes(10))
+                        .lastRandomObjectPower(LocalDateTime.now().minusMinutes(15))
+                        .lastTakeSnowball(LocalDateTime.now().minusMinutes(15))
                         .build());
             }).onSuccess(unused -> playerRepository.saveAll(players));
         });

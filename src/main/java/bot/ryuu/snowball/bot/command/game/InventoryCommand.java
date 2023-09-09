@@ -1,8 +1,6 @@
 package bot.ryuu.snowball.bot.command.game;
 
 import bot.ryuu.snowball.bot.command.AbstractCommand;
-import bot.ryuu.snowball.game.EventAction;
-import bot.ryuu.snowball.game.TimeStamp;
 import bot.ryuu.snowball.game.power.Power;
 import bot.ryuu.snowball.player.Player;
 import bot.ryuu.snowball.player.PlayerRepository;
@@ -17,21 +15,22 @@ import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionE
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
+import java.util.List;
 import java.util.Optional;
 
-@Getter
 @Setter
-public class RandomCommand extends AbstractCommand {
+@Getter
+public class InventoryCommand extends AbstractCommand {
     private PlayerRepository playerRepository;
 
-    public RandomCommand(PlayerRepository playerRepository) {
+    public InventoryCommand(PlayerRepository playerRepository) {
         super(playerRepository);
 
-        setCode("_random");
-        setCommandData(Commands.slash("random", "random object of power")
+        setCode("_inventory_command");
+        setCommandData(Commands.slash("inventory", "your inventory")
                 .setGuildOnly(true));
 
-        this.playerRepository = playerRepository;
+        setPlayerRepository(playerRepository);
     }
 
     @Override
@@ -39,18 +38,20 @@ public class RandomCommand extends AbstractCommand {
         Optional<Player> player = playerRepository.findById(event.getUser().getId());
 
         if (player.isPresent()) {
-            Power power = EventAction.randomPower(player.get());
+            List<Power> powers = player.get().getObjectPowerSet().stream().toList();
+            StringBuilder inventory = new StringBuilder();
 
-            if (power != null)
-                event.deferReply(true).setEmbeds(
-                        power.info()
-                ).queue();
-            else
-                event.deferReply(true).setEmbeds(
-                        ThemeMessage.getMainEmbed()
-                                .setDescription("You can only get the next item after " +
-                                        TimeStamp.TIMESTAMP_RANDOM_POWER + " minutes").build()
-                ).queue();
+            int i = 0;
+            while (i < powers.size()) {
+
+            }
+            /*
+            * # # #|# # #|# # #
+            * # A #|# B #|# V #
+            * # # #|# # #|# # #
+            * -----------------
+            *
+            * */
         } else
             event.deferReply(true).setEmbeds(
                     ThemeMessage.getErrorEmbed()

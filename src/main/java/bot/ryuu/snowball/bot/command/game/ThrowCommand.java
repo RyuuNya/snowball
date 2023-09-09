@@ -31,7 +31,7 @@ public class ThrowCommand extends AbstractCommand {
         super(playerRepository);
 
         setCode("_throw");
-        setCommandData(Commands.slash("throw", "snowball the user")
+        setCommandData(Commands.slash("throw", "throw a snowball at a player")
                 .addOption(OptionType.USER, "user", "user you want to throw a snowball at", true)
                 .addOptions(
                         new OptionData(OptionType.STRING, "power", "power up")

@@ -10,21 +10,31 @@ import net.dv8tion.jda.api.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
 public class EventAction {
-    public static final int PROBABILITY_FORTUNE = 20;
-    public static final int PROBABILITY_BIG_BAGS = 50;
-    public static final int PROBABILITY_THIEF = 90;
+    /**
+     * Fortune - 10% - 10
+     * Big bags - 30% - 40
+     * Thief - 35% - 75
+     * Boost - 20% - 95
+     * */
+    public static final int PROBABILITY_FORTUNE = 10;
+    public static final int PROBABILITY_BIG_BAGS = 40;
+    public static final int PROBABILITY_THIEF = 75;
+    public static final int PROBABILITY_BOOST = 95;
 
     public static final int PROBABILITY_SHOT = 60;
 
     public static PlayerRepository playerRepository;
 
     public static Event takeSnowball(Player a, Player b) {
-        if (PowerSystem.isActiveObject(a)) {
+        if (TimeStamp.isExecuteTakeSnowball(a.getLastTakeSnowball(), LocalDateTime.now())) {
+            return Event.TIMER_OVER;
+        } else if (PowerSystem.isActiveObject(a)) {
             return PowerSystem.getActiveObject(a).action(a, b, playerRepository);
         } else {
             a.incSnowballAmount(1);
@@ -57,6 +67,9 @@ public class EventAction {
     }
 
     public static Power randomPower(Player a) {
+        if (TimeStamp.isExecuteRandomObjectPower(a.getLastRandomObjectPower(), LocalDateTime.now()))
+            return null;
+
         Power power = randomPower();
 
         a.putObject(power);
@@ -99,6 +112,8 @@ public class EventAction {
             return Power.BIG_BAGS;
         else if (random < PROBABILITY_THIEF)
             return Power.THIEF;
+        else if (random < PROBABILITY_BOOST)
+            return Power.BOOST;
         else
             return Power.PACIFIER;
     }

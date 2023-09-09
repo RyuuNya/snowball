@@ -7,5 +7,6 @@ public enum Event {
     NULL,
     TAKE_SNOWBALL,
     TAKE_SNOWBALL_BIG_BAGS,
-    TAKE_SNOWBALL_THIEF
+    TAKE_SNOWBALL_THIEF,
+    TIMER_OVER
 }
