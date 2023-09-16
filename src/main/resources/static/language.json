@@ -1,0 +1,124 @@
+{
+    "params": [
+        {
+            "name": "error",
+            "en": "error occurred",
+            "ru": "произошла ошибка"
+        },
+        {
+            "name": "null",
+            "en": "Hmm, nothing happened",
+            "ru": "Хмм, ничего не произошло"
+        },
+        {
+            "name": "take-snowball",
+            "en": "You picked up one snowball",
+            "ru": "Вы подняли один снежок"
+        },
+        {
+            "name": "take-snowball-big-bags",
+            "en": "You picked up 3 snowballs",
+            "ru": "Вы подняли 3 снежка"
+        },
+        {
+            "name": "take-snowball-thief",
+            "en": "You stole half the snowballs from a player",
+            "ru": "Вы украли у игрока половину снежков"
+        },
+        {
+            "name": "hit",
+            "en": "> hits a snowball into <@",
+            "ru": "> попадает снежком в <@"
+        },
+        {
+            "name": "missed_1",
+            "en": "> wanted to throw a snowball at <@",
+            "ru": "> хотел бросить снежок в <@"
+        },
+        {
+            "name": "missed_2",
+            "en": ">, but missed",
+            "ru": ">, но промахнулся"
+        },
+        {
+            "name": "snowball-empty",
+            "en": "You don't have enough snowballs",
+            "ru": "У вас недостаточно снежков"
+        },
+        {
+            "name": "time-over-take_1",
+            "en": "You've already taken a snowball, wait ",
+            "ru": "Вы уже подобрали снежок, подождите "
+        },
+        {
+            "name": "time-over-take_2",
+            "en": " minutes to take another one",
+            "ru": " минут, чтобы подобрать еще один"
+        },
+        {
+            "name": "time-over-random_1",
+            "en": "You can only can get the next item after ",
+            "ru": "Следующий элемент можно получить только после "
+        },
+        {
+            "name": "time-over-random_2",
+            "en": " minutes",
+            "ru": " минут"
+        },
+        {
+            "name": "rating-server",
+            "en": "Rating server",
+            "ru": "Рейтинг сервера"
+        },
+        {
+            "name": "king-server",
+            "en": "The snowball king of this server is <@",
+            "ru": "Королем снежков на этом сервере является <@"
+        },
+        {
+            "name": "server-reset",
+            "en": "User data has been reset",
+            "ru": "Пользовательские данные были сброшены"
+        },
+        {
+            "name": "help_1",
+            "en": "## Command list\n`take` - to take one snowball\n`throw` - throw a snowball at a player\n`stats` - your statistics\n`rating` - server rating\n`random` - gives you a random ability, to use the ability, select it on the action\n`king` - king of the server on points",
+            "ru": "## Список команд\n`take` - взять один снежок\n`throw` - бросить снежок в игрока\n`stats` - ваша статистика\n`rating` - рейтинг сервера\n`random` - дает вам случайную способность, чтобы использовать способность, выберите ее в действии\n`king` - король сервера по очкам"
+        },
+        {
+            "name": "help_2",
+            "en": "## Welcome to the game - snowball\n\nThe rules of the game are simple, you take a snowball and throw it at another player.\n\nTo pick up a snowball use the `take` command, to throw a snowball use the `throw` command.",
+            "ru": "## Добро пожаловать в игру - Snowball\n\nПравила игры просты: вы берете снежок и бросаете его в другого игрока.\n\nЧтобы взять снежок, используйте команду `take`, чтобы бросить снежок - команду `throw`."
+        },
+        {
+            "name": "help_3-title",
+            "en": "Power",
+            "ru": "Сила"
+        },
+        {
+            "name": "help_3",
+            "en": "To make the game was not boring use the New Year's power.\n\n`fortune` - increases the chance of hitting a player to 100%\n`big bags` - you pick up 3 snowballs at a time\n`thief` - you steal half of another player's snowballs (mandatory - when using power, specify the player)\n`boost` - you get more points for hitting a player",
+            "ru": "Чтобы игра не была скучной, используйте новогоднюю силу.\n\n`fortune` - увеличивает шанс попадания в игрока до 100%\n`big Bags` - вы собираете 3 снежка за раз\n`thief` - вы крадете половину снежков другого игрока (обязательно - при использовании силы указывайте игрока)\n`boost` - вы получаете больше очков за попадание в игрока"
+        },
+        {
+            "name": "rating-server-time-over",
+            "en": "The request has been out of date for a long time",
+            "ru": "Запрос давно устарел"
+        },
+        {
+            "name": "server-lang",
+            "en": "The server language has been changed",
+            "ru": "Язык сервера был изменен"
+        },
+        {
+            "name": "give-item",
+            "en": "received the following item - ",
+            "ru": "получил следующий элемент - "
+        },
+        {
+            "name": "reset-error",
+            "en": "You have insufficient rights or an error has occurred",
+            "ru": "Вы не обладаете достаточными правами или произошла ошибка"
+        }
+    ]
+}

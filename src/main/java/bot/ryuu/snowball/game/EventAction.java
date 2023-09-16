@@ -1,27 +1,17 @@
 package bot.ryuu.snowball.game;
 
+import bot.ryuu.snowball.data.DataCluster;
+import bot.ryuu.snowball.data.player.Player;
+import bot.ryuu.snowball.game.event.Event;
+import bot.ryuu.snowball.game.event.EventType;
 import bot.ryuu.snowball.game.power.Power;
-import bot.ryuu.snowball.player.Player;
-import bot.ryuu.snowball.player.PlayerRepository;
-import bot.ryuu.snowball.theme.ThemeEditing;
-import bot.ryuu.snowball.theme.ThemeMessage;
+import bot.ryuu.snowball.theme.Theme;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
-import java.util.List;
 
-@Component
 public class EventAction {
-    /**
-     * Fortune - 10% - 10
-     * Big bags - 30% - 40
-     * Thief - 35% - 75
-     * Boost - 20% - 95
-     * */
     public static final int PROBABILITY_FORTUNE = 10;
     public static final int PROBABILITY_BIG_BAGS = 40;
     public static final int PROBABILITY_THIEF = 75;
@@ -29,74 +19,68 @@ public class EventAction {
 
     public static final int PROBABILITY_SHOT = 60;
 
-    public static PlayerRepository playerRepository;
+    public static <T> Event<T> takeSnowball(Player a, Player b, DataCluster dataCluster) {
+        if (TimeStamp.isExecuteTakeSnowball(a.getLastTakeSnowball(), LocalDateTime.now()))
+            return Event.of(EventType.TIMER_OVER);
+        else if (a.isActive())
+            return a.getActive().action(a, b, dataCluster);
+        else {
+            a.incSnowball(1)
+                    .setLastTakeSnowball(LocalDateTime.now())
+                    .save(dataCluster.getPlayerRepository());
 
-    public static Event takeSnowball(Player a, Player b) {
-        if (TimeStamp.isExecuteTakeSnowball(a.getLastTakeSnowball(), LocalDateTime.now())) {
-            return Event.TIMER_OVER;
-        } else if (PowerSystem.isActiveObject(a)) {
-            return PowerSystem.getActiveObject(a).action(a, b, playerRepository);
-        } else {
-            a.incSnowballAmount(1);
-            a.setLastTakeSnowball(LocalDateTime.now());
-            playerRepository.save(a);
-
-            return Event.TAKE_SNOWBALL;
+            return Event.of(EventType.TAKE_SNOWBALL);
         }
     }
 
-    public static Event throwSnowball(Player a, Player b) {
-        if (PowerSystem.isActiveObject(a)) {
-            return PowerSystem.getActiveObject(a).action(a, b, playerRepository);
+    public static <T> Event<T> throwSnowball(Player a, Player b, DataCluster dataCluster) {
+        if (a.isActive()) {
+            return a.getActive().action(a, b, dataCluster);
         } else {
-            a.incSnowballAmount(-1);
+            if (randomShot() && a.getSnowball() > 0) {
+                a.incScore(25)
+                        .incSnowball(-1)
+                        .save(dataCluster.getPlayerRepository());
 
-            if (randomShot()) {
-                a.incScore(25);
-                b.incScore(-5);
+                b.incScore(-5)
+                        .save(dataCluster.getPlayerRepository());
 
-                playerRepository.saveAll(List.of(a, b));
+                return Event.of(EventType.HIT);
+            } else if (a.getSnowball() <= 0) {
+                return Event.of(EventType.SNOWBALL_LIMIT);
+            } else {
+                a
+                        .incSnowball(-1)
+                        .save(dataCluster.getPlayerRepository());
 
-                return Event.HIT;
+                return Event.of(EventType.MISSED);
             }
-
-            playerRepository.saveAll(List.of(a, b));
         }
-
-        return Event.MISSED;
     }
 
-    public static Power randomPower(Player a) {
-        if (TimeStamp.isExecuteRandomObjectPower(a.getLastRandomObjectPower(), LocalDateTime.now()))
-            return null;
+    public static Event<Power> randomPower(Player a, DataCluster dataCluster) {
+        if (TimeStamp.isExecuteRandomObjectPower(a.getLastRandomPower(), LocalDateTime.now()))
+            return Event.of(EventType.TIMER_OVER);
 
         Power power = randomPower();
 
-        a.putObject(power);
-        a.setLastRandomObjectPower(LocalDateTime.now());
+        a.addPower(power)
+                .setLastRandomPower(LocalDateTime.now())
+                .save(dataCluster.getPlayerRepository());
 
-        playerRepository.save(a);
-
-        return power;
+        return Event.of(EventType.NEW_OBJECT, power);
     }
 
     public static MessageEmbed statisticPlayer(Player player, User user) {
         String statistic =
-                "point: " + ThemeEditing.bold(player.getScore()) + "\n" +
-                        "level: " + ThemeEditing.bold(player.getLevel()) + "\n" +
-                        "snowball: " + ThemeEditing.bold(player.getSnowballAmount());
+                "score: " + player.getScore() + "\n" +
+                        "snowball: " + player.getSnowball();
 
-        return ThemeMessage.getMainEmbed()
+        return Theme.getMainEmbed()
                 .setTitle("Statistic " + user.getName())
                 .setThumbnail(user.getAvatarUrl())
                 .setDescription(statistic)
                 .build();
-    }
-
-    /** Service */
-    @Autowired
-    private void setPlayerRepository(PlayerRepository playerRepository) {
-        EventAction.playerRepository = playerRepository;
     }
 
     public static boolean randomShot() {

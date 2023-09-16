@@ -1,20 +1,16 @@
 package bot.ryuu.snowball.bot.listener;
 
-import bot.ryuu.snowball.bot.command.AbstractCommand;
-import lombok.Getter;
+import bot.ryuu.snowball.bot.commands.AbstractCommand;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Objects;
 
-@Getter
 @Setter
-@Component
 public class GameCommandListener extends ListenerAdapter {
     private List<AbstractCommand> commands;
 

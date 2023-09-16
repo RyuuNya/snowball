@@ -1,14 +1,16 @@
 package bot.ryuu.snowball.bot;
 
 import bot.ryuu.snowball.SnowballApplication;
-import bot.ryuu.snowball.bot.command.AbstractCommand;
-import bot.ryuu.snowball.bot.command.game.*;
-import bot.ryuu.snowball.bot.command.system.HelpCommand;
-import bot.ryuu.snowball.bot.command.system.ResetCommand;
+import bot.ryuu.snowball.bot.commands.AbstractCommand;
+import bot.ryuu.snowball.bot.commands.game.*;
+import bot.ryuu.snowball.bot.commands.system.HelpCommand;
+import bot.ryuu.snowball.bot.commands.system.LanguageCommand;
+import bot.ryuu.snowball.bot.commands.system.ResetCommand;
 import bot.ryuu.snowball.bot.listener.GameCommandListener;
 import bot.ryuu.snowball.bot.listener.SystemListener;
-import bot.ryuu.snowball.player.Player;
-import bot.ryuu.snowball.player.PlayerRepository;
+import bot.ryuu.snowball.data.DataCluster;
+import bot.ryuu.snowball.data.player.Player;
+import bot.ryuu.snowball.data.server.Server;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -25,41 +27,41 @@ import java.util.List;
 
 @Service
 public class Bot {
-    private static final String token = SnowballApplication.getToken();
+    private final String TOKEN = SnowballApplication.getToken();
 
-    private final PlayerRepository playerRepository;
+    private final DataCluster dataCluster;
 
     private final List<AbstractCommand> commands;
 
-    public Bot(PlayerRepository playerRepository) {
-        this.playerRepository = playerRepository;
+    public Bot(DataCluster dataCluster) {
+        this.dataCluster = dataCluster;
 
         this.commands = List.of(
-            new TakeCommand(playerRepository),
-            new ThrowCommand(playerRepository),
-            new StatisticCommand(playerRepository),
-            new RandomCommand(playerRepository),
-            new RatingCommand(playerRepository),
-            new KingCommand(playerRepository),
-            new PowersCommand(playerRepository),
+                new TakeCommand(dataCluster),
+                new ThrowCommand(dataCluster),
+                new StatisticCommand(dataCluster),
+                new PowersCommand(dataCluster),
+                new RandomCommand(dataCluster),
+                new RatingCommand(dataCluster),
 
-            new ResetCommand(playerRepository),
-            new HelpCommand(playerRepository)
+                new HelpCommand(dataCluster),
+                new LanguageCommand(dataCluster),
+                new ResetCommand(dataCluster)
         );
     }
 
     public JDA getClient() throws InterruptedException {
-        return JDABuilder.createDefault(token)
+        return JDABuilder.createDefault(TOKEN)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .build().awaitReady();
     }
 
     @Bean
     private void build() throws InterruptedException {
-        JDABuilder.createDefault(token)
+        JDABuilder.createDefault(TOKEN)
                 .setStatus(OnlineStatus.ONLINE)
                 .addEventListeners(new GameCommandListener(commands))
-                .addEventListeners(new SystemListener(playerRepository))
+                .addEventListeners(new SystemListener(dataCluster))
                 .setActivity(Activity.playing("snowball"))
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .build().awaitReady();
@@ -74,24 +76,33 @@ public class Bot {
     }
 
     @Bean
-    private void loadMember() throws InterruptedException {
-        System.out.println("[ -- START MEMBER LOAD -- ]");
+    private void loadMemberServer() throws InterruptedException {
+        System.out.println("[ -- START MEMBER & SERVER LOAD -- ]");
         getClient().getGuilds().forEach(guild -> {
+            Server server = Server.builder()
+                    .id(guild.getId())
+                    .language("en")
+                    .build();
+
             ArrayList<Player> players = new ArrayList<>();
+
             guild.loadMembers(member -> {
-                players.add(Player.builder()
-                        .id(member.getId())
-                        .idMember(member.getId())
-                        .level(0)
-                        .score(0)
-                        .server(guild.getId())
-                        .objectPowerSet(new HashSet<>())
-                        .snowballAmount(0)
-                        .lastRandomObjectPower(LocalDateTime.now().minusMinutes(15))
-                        .lastTakeSnowball(LocalDateTime.now().minusMinutes(15))
-                        .build());
-            }).onSuccess(unused -> playerRepository.saveAll(players));
+                players.add(
+                        Player.builder()
+                                .member(member.getId())
+                                .server(guild.getId())
+                                .powers(new HashSet<>())
+                                .snowball(0)
+                                .lastRandomPower(LocalDateTime.now().minusMinutes(10))
+                                .lastTakeSnowball(LocalDateTime.now().minusMinutes(10))
+                                .score(0)
+                                .build()
+                );
+            }).onSuccess(unused -> {
+                dataCluster.savePlayerAll(players);
+                server.save(dataCluster.getServerRepository());
+            });
         });
-        System.out.println("[ -- FINISH MEMBER LOAD --] ");
+        System.out.println("[ -- FINISH MEMBER & SERVER LOAD --] ");
     }
 }
