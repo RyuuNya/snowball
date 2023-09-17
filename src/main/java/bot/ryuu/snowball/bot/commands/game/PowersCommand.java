@@ -18,14 +18,7 @@ public class PowersCommand extends AbstractCommand {
         setCommandData(
                 Commands.slash("powers", "all-power information")
                     .addOptions(
-                            new OptionData(OptionType.STRING, "power", "subject that interests you", true)
-                                    .addChoice("fortune", "FORTUNE")
-                                    .addChoice("big bags", "BIG_BAGS")
-                                    .addChoice("boost", "BOOST")
-                                    .addChoice("thief", "THIEF")
-                                    .addChoice("super throw", "SUPER-THROW")
-                                    .addChoice("pacifier", "PACIFIER")
-                                    .addChoice("enrolment", "ENROLMENT")
+                            getPowerOption(true)
                     )
                     .setGuildOnly(true)
         );

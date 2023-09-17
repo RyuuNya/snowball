@@ -6,7 +6,10 @@ import bot.ryuu.snowball.data.player.Player;
 import bot.ryuu.snowball.game.EventAction;
 import bot.ryuu.snowball.game.TimeStamp;
 import bot.ryuu.snowball.game.event.Event;
-import bot.ryuu.snowball.game.event.EventType;
+import bot.ryuu.snowball.game.event.request.EventRequest;
+import bot.ryuu.snowball.game.event.request.Request;
+import bot.ryuu.snowball.game.event.request.RequestBody;
+import bot.ryuu.snowball.game.event.response.EventResponse;
 import bot.ryuu.snowball.game.power.Power;
 import bot.ryuu.snowball.language.Language;
 import bot.ryuu.snowball.theme.Theme;
@@ -27,11 +30,7 @@ public class TakeCommand extends AbstractCommand {
         setCommandData(
                 Commands.slash("take", "to take one snowball")
                         .addOptions(
-                                new OptionData(OptionType.STRING, "power", "power up")
-                                        .addChoices(
-                                                new Command.Choice("big bags", "BIG_BAGS"),
-                                                new Command.Choice("thief", "THIEF")
-                                        )
+                                getPowerOption(false)
                         )
                         .setGuildOnly(true)
         );
@@ -45,20 +44,24 @@ public class TakeCommand extends AbstractCommand {
         Optional<String> activePower = getOptionString(slash, "power");
 
         if (a.isPresent()) {
+            boolean activate = true;
             if (activePower.isPresent())
-                switch (activePower.get()) {
-                    case "BIG_BAGS" -> a.get().activatePower(Power.BIG_BAGS);
-                    case "THIEF" -> a.get().activatePower(Power.THIEF);
-                }
+                activate = EventAction.activatePower(
+                        EventRequest.of(Request.TAKE, new RequestBody(a.get(), null, dataCluster), activePower.get())
+                );
 
-            Event event = EventAction.takeSnowball(a.get(), null, dataCluster);
+            if (activate) {
+                EventResponse event = EventAction.takeSnowball(a.get(), null, dataCluster);
 
-            replySlash(slash, event);
+                replySlash(slash, event);
+            } else
+                replyNon(slash);
+
         } else
             replyError(slash);
     }
 
-    private void replySlash(SlashCommandInteractionEvent slash, Event event) {
+    private void replySlash(SlashCommandInteractionEvent slash, EventResponse event) {
         String message = Language.message("null", getLanguage(slash));
 
         switch (event.getType()) {
@@ -68,6 +71,8 @@ public class TakeCommand extends AbstractCommand {
                     message = Language.message("take-snowball-big-bags", getLanguage(slash));
             case TAKE_SNOWBALL_THIEF ->
                     message = Language.message("take-snowball-thief", getLanguage(slash));
+            case TAKE_SNOWBALL_FORTUNE ->
+                    message = Language.message("take-snowball-fortune", getLanguage(slash));
             case TIMER_OVER -> message =
                     Language.message("time-over-take_1", getLanguage(slash))
                             + TimeStamp.TIMESTAMP_TAKE_SNOWBALL + Language.message("time-over-take_2", getLanguage(slash));

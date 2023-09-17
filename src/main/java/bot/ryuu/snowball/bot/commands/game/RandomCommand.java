@@ -22,7 +22,10 @@ public class RandomCommand extends AbstractCommand {
         setCode("_random_command");
         setCommandData(
                 Commands.slash("random", "random object of power")
-                    .setGuildOnly(true)
+                        .addOptions(
+                                getPowerOption(false)
+                        )
+                        .setGuildOnly(true)
         );
     }
 

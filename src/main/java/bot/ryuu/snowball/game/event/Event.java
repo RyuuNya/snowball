@@ -5,29 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public final class Event {
-    private EventType type;
+public class Event {
     private Object value;
 
-    public Event(EventType type, Object value) {
-        this.type = type;
+    public Event(Object value) {
         this.value = value;
-    }
-
-    public static Event of(EventType type, Object value) {
-        return new Event(type, value);
-    }
-
-    public static Event of(EventType type) {
-        return new Event(type, null);
-    }
-
-    public static Event error() {
-        return new Event(EventType.ERROR, null);
-    }
-
-    public static Event empty() {
-        return new Event(EventType.NULL, null);
     }
 
     public boolean isPresent() {

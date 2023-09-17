@@ -14,11 +14,21 @@ public interface CommandInstruments {
 
     Optional<Player> getPlayer(Optional<String> member, String server);
 
-    Optional<String> getOptionString(SlashCommandInteractionEvent event, String option);
-
-    Optional<User> getOptionUser(SlashCommandInteractionEvent event, String option);
-
     String getLanguage(SlashCommandInteractionEvent event);
 
     String getLanguage(ButtonInteractionEvent event);
+
+    default Optional<String> getOptionString(SlashCommandInteractionEvent event, String option) {
+        if (event.getOption(option) != null)
+            return Optional.of(event.getOption(option).getAsString());
+        else
+            return Optional.empty();
+    };
+
+    default Optional<User> getOptionUser(SlashCommandInteractionEvent event, String option) {
+        if (event.getOption(option) != null)
+            return Optional.of(event.getOption(option).getAsUser());
+        else
+            return Optional.empty();
+    };
 }

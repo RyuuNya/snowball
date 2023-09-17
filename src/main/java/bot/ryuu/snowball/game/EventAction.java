@@ -3,7 +3,11 @@ package bot.ryuu.snowball.game;
 import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.player.Player;
 import bot.ryuu.snowball.game.event.Event;
-import bot.ryuu.snowball.game.event.EventType;
+import bot.ryuu.snowball.game.event.request.EventRequest;
+import bot.ryuu.snowball.game.event.request.Request;
+import bot.ryuu.snowball.game.event.request.RequestBody;
+import bot.ryuu.snowball.game.event.response.EventResponse;
+import bot.ryuu.snowball.game.event.response.Response;
 import bot.ryuu.snowball.game.power.Power;
 import bot.ryuu.snowball.theme.Theme;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -32,23 +36,27 @@ public class EventAction {
 
     public static final int PROBABILITY_SHOT = 60;
 
-    public static Event takeSnowball(Player a, Player b, DataCluster dataCluster) {
+    public static EventResponse takeSnowball(Player a, Player b, DataCluster dataCluster) {
         if (TimeStamp.isExecuteTakeSnowball(a.getLastTakeSnowball(), LocalDateTime.now()))
-            return Event.of(EventType.TIMER_OVER);
+            return EventResponse.of(Response.TIMER_OVER);
         else if (a.isActive())
-            return a.getActive().action(a, b, dataCluster);
+            return a.getActive().action(
+                    EventRequest.of(Request.TAKE, new RequestBody(a, b, dataCluster))
+            );
         else {
             a.incSnowball(1)
                     .setLastTakeSnowball(LocalDateTime.now())
                     .save(dataCluster.getPlayerRepository());
 
-            return Event.of(EventType.TAKE_SNOWBALL);
+            return EventResponse.of(Response.TAKE_SNOWBALL);
         }
     }
 
-    public static Event throwSnowball(Player a, Player b, DataCluster dataCluster) {
+    public static EventResponse throwSnowball(Player a, Player b, DataCluster dataCluster) {
         if (a.isActive()) {
-            return a.getActive().action(a, b, dataCluster);
+            return a.getActive().action(
+                    EventRequest.of(Request.THROW, new RequestBody(a, b, dataCluster))
+            );
         } else {
             if (randomShot() && a.getSnowball() > 0) {
                 a.incScore(25)
@@ -58,22 +66,22 @@ public class EventAction {
                 b.incScore(-5)
                         .save(dataCluster.getPlayerRepository());
 
-                return Event.of(EventType.HIT);
+                return EventResponse.of(Response.HIT);
             } else if (a.getSnowball() <= 0) {
-                return Event.of(EventType.SNOWBALL_LIMIT);
+                return EventResponse.of(Response.SNOWBALL_LIMIT);
             } else {
                 a
                         .incSnowball(-1)
                         .save(dataCluster.getPlayerRepository());
 
-                return Event.of(EventType.MISSED);
+                return EventResponse.of(Response.MISSED);
             }
         }
     }
 
-    public static Event randomPower(Player a, DataCluster dataCluster) {
+    public static EventResponse randomPower(Player a, DataCluster dataCluster) {
         if (TimeStamp.isExecuteRandomObjectPower(a.getLastRandomPower(), LocalDateTime.now()))
-            return Event.of(EventType.TIMER_OVER);
+            return EventResponse.of(Response.TIMER_OVER);
 
         Power power = randomPower();
 
@@ -81,7 +89,7 @@ public class EventAction {
                 .setLastRandomPower(LocalDateTime.now())
                 .save(dataCluster.getPlayerRepository());
 
-        return Event.of(EventType.NEW_OBJECT, power);
+        return EventResponse.of(Response.NEW_OBJECT, power);
     }
 
     public static MessageEmbed statisticPlayer(Player player, User user) {
@@ -94,6 +102,43 @@ public class EventAction {
                 .setThumbnail(user.getAvatarUrl())
                 .setDescription(statistic)
                 .build();
+    }
+
+    public static boolean activatePower(EventRequest request) {
+        Power power = Power.valueOf(request.staticCast());
+
+        System.out.println(" ~ " + power);
+
+        switch (request.getType()) {
+            case TAKE -> {
+                if (power.equals(Power.FORTUNE) || power.equals(Power.BIG_BAGS) || power.equals(Power.THIEF)) {
+                    request.getBody().a().activatePower(power)
+                            .save(request.getBody().dataCluster().getPlayerRepository());
+
+                    return true;
+                }
+            }
+            case THROW -> {
+                if (power.equals(Power.FORTUNE) || power.equals(Power.BOOST) ||
+                        power.equals(Power.ENROLMENT) || power.equals(Power.SUPER_THROW)) {
+                    request.getBody().a().activatePower(power)
+                            .save(request.getBody().dataCluster().getPlayerRepository());
+
+                    return true;
+                }
+            }
+            case RANDOM ->
+            {
+                if (power.equals(Power.FORTUNE)) {
+                    request.getBody().a().activatePower(power)
+                            .save(request.getBody().dataCluster().getPlayerRepository());
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public static boolean randomShot() {

@@ -5,7 +5,11 @@ import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.player.Player;
 import bot.ryuu.snowball.game.EventAction;
 import bot.ryuu.snowball.game.event.Event;
-import bot.ryuu.snowball.game.event.EventType;
+import bot.ryuu.snowball.game.event.request.EventRequest;
+import bot.ryuu.snowball.game.event.request.Request;
+import bot.ryuu.snowball.game.event.request.RequestBody;
+import bot.ryuu.snowball.game.event.response.EventResponse;
+import bot.ryuu.snowball.game.event.response.Response;
 import bot.ryuu.snowball.game.power.Power;
 import bot.ryuu.snowball.language.Language;
 import bot.ryuu.snowball.theme.Theme;
@@ -28,10 +32,7 @@ public class ThrowCommand extends AbstractCommand {
                 Commands.slash("throw", "throw a snowball at a player")
                     .addOption(OptionType.USER, "user", "user you want to throw a snowball at", true)
                     .addOptions(
-                            new OptionData(OptionType.STRING, "power", "power up")
-                                    .addChoice("fortune", "FORTUNE")
-                                    .addChoice("super throw", "SUPER-THROW")
-                                    .addChoice("enrolment", "ENROLMENT")
+                            getPowerOption(false)
                     )
                     .setGuildOnly(true)
         );
@@ -47,21 +48,25 @@ public class ThrowCommand extends AbstractCommand {
         Optional<String> activePower = getOptionString(slash, "power");
 
         if (a.isPresent() && b.isPresent()) {
+            boolean activate = true;
+
             if (activePower.isPresent())
-                switch (activePower.get()) {
-                    case "FORTUNE" -> a.get().activatePower(Power.FORTUNE);
-                    case "ENROLMENT" -> a.get().activatePower(Power.ENROLMENT);
-                    case "SUPER-THROW" -> a.get().activatePower(Power.SUPER_THROW);
-                }
+                activate = EventAction.activatePower(
+                        EventRequest.of(Request.TAKE, new RequestBody(a.get(), null, dataCluster), activePower.get())
+                );
 
-            Event event = EventAction.throwSnowball(a.get(), b.get(), dataCluster);
 
-            replySlash(slash, event, a.get(), b.get());
+            if (activate) {
+                EventResponse event = EventAction.throwSnowball(a.get(), b.get(), dataCluster);
+
+                replySlash(slash, event, a.get(), b.get());
+            } else
+                replyNon(slash);
         } else
             replyError(slash);
     }
 
-    private void replySlash(SlashCommandInteractionEvent slash, Event event, Player a, Player b) {
+    private void replySlash(SlashCommandInteractionEvent slash, EventResponse event, Player a, Player b) {
         String message = Language.message("null", getLanguage(slash));
 
         switch (event.getType()) {
@@ -102,8 +107,8 @@ public class ThrowCommand extends AbstractCommand {
                     message = Language.message("snowball-empty", getLanguage(slash));
         }
 
-        slash.deferReply(!(event.getType() == EventType.MISSED || event.getType() == EventType.HIT)).setContent(
-                (event.getType() == EventType.HIT || event.getType() == EventType.MISSED) ?
+        slash.deferReply(!(event.getType() == Response.MISSED || event.getType() == Response.HIT)).setContent(
+                (event.getType() == Response.HIT || event.getType() == Response.MISSED) ?
                         "<@" + b.getMember() + ">" : ""
         ).setEmbeds(
                 Theme.getMainEmbed()

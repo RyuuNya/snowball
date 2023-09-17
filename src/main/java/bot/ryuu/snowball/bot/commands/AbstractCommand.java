@@ -3,16 +3,21 @@ package bot.ryuu.snowball.bot.commands;
 import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.player.Player;
 import bot.ryuu.snowball.data.server.Server;
-import net.dv8tion.jda.api.entities.User;
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.Optional;
 
+@Getter
+@Setter
 public class AbstractCommand implements CommandInstruments, CommandReply {
     protected String code;
     protected CommandData commandData;
@@ -51,20 +56,15 @@ public class AbstractCommand implements CommandInstruments, CommandReply {
     protected void modalInteraction(ModalInteractionEvent modal) {
     }
 
-    public void setCommandData(CommandData commandData) {
-        this.commandData = commandData;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public CommandData getCommandData() {
-        return commandData;
+    protected OptionData getPowerOption(Boolean required) {
+        return new OptionData(OptionType.STRING, "power", "subject that interests you", required)
+                .addChoice("fortune", "FORTUNE")
+                .addChoice("big bags", "BIG_BAGS")
+                .addChoice("boost", "BOOST")
+                .addChoice("thief", "THIEF")
+                .addChoice("super throw", "SUPER_THROW")
+                .addChoice("pacifier", "PACIFIER")
+                .addChoice("enrolment", "ENROLMENT");
     }
 
     @Override
@@ -81,22 +81,6 @@ public class AbstractCommand implements CommandInstruments, CommandReply {
     public Optional<Player> getPlayer(Optional<String> member, String server) {
         if (member.isPresent())
             return dataCluster.getPlayerProfile(member.get(), server);
-        else
-            return Optional.empty();
-    }
-
-    @Override
-    public Optional<String> getOptionString(SlashCommandInteractionEvent event, String option) {
-        if (event.getOption(option) != null)
-            return Optional.of(event.getOption(option).getAsString());
-        else
-            return Optional.empty();
-    }
-
-    @Override
-    public Optional<User> getOptionUser(SlashCommandInteractionEvent event, String option) {
-        if (event.getOption(option) != null)
-            return Optional.of(event.getOption(option).getAsUser());
         else
             return Optional.empty();
     }

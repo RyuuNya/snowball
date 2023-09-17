@@ -4,7 +4,10 @@ import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.player.Player;
 import bot.ryuu.snowball.game.EventAction;
 import bot.ryuu.snowball.game.event.Event;
-import bot.ryuu.snowball.game.event.EventType;
+import bot.ryuu.snowball.game.event.request.EventRequest;
+import bot.ryuu.snowball.game.event.request.Request;
+import bot.ryuu.snowball.game.event.response.EventResponse;
+import bot.ryuu.snowball.game.event.response.Response;
 import bot.ryuu.snowball.language.Language;
 import bot.ryuu.snowball.theme.Theme;
 import lombok.AllArgsConstructor;
@@ -24,7 +27,11 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150401657847431229/boost.png"
     ) {
         @Override
-        public Event action(Player a, Player b, DataCluster dataCluster) {
+        public EventResponse action(EventRequest request) {
+            Player a = request.getBody().a();
+            Player b = request.getBody().b();
+            DataCluster dataCluster = request.getBody().dataCluster();
+
             if (a != null && b != null) {
                 if (EventAction.randomShot()) {
                     a.incScore(35)
@@ -35,17 +42,17 @@ public enum Power implements PowerAction {
                     b.incScore(-5)
                             .save(dataCluster.getPlayerRepository());
 
-                    return Event.of(EventType.HIT);
+                    return EventResponse.of(Response.HIT);
                 } else {
                     a.incSnowball(-1)
                             .removeActive(this)
                             .save(dataCluster.getPlayerRepository());
 
-                    return Event.of(EventType.MISSED);
+                    return EventResponse.of(Response.MISSED);
                 }
             }
 
-            return super.action(a, b, dataCluster);
+            return super.action(request);
         }
     },
     BIG_BAGS(
@@ -55,17 +62,20 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150401657524453436/big_bags.png"
     ) {
         @Override
-        public Event action(Player a, Player b, DataCluster dataCluster) {
+        public EventResponse action(EventRequest request) {
+            Player a = request.getBody().a();
+            DataCluster dataCluster = request.getBody().dataCluster();
+
             if (a != null) {
                 a.incSnowball(3)
                         .setLastTakeSnowball(LocalDateTime.now())
                         .removeActive(this)
                         .save(dataCluster.getPlayerRepository());
 
-                return Event.of(EventType.TAKE_SNOWBALL_BIG_BAGS);
+                return EventResponse.of(Response.TAKE_SNOWBALL_BIG_BAGS);
             }
 
-            return super.action(a, b, dataCluster);
+            return super.action(request);
         }
     },
     THIEF(
@@ -75,7 +85,10 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150422042760466452/thief.png"
     ) {
         @Override
-        public Event action(Player a, Player b, DataCluster dataCluster) {
+        public EventResponse action(EventRequest request) {
+            Player a = request.getBody().a();
+            DataCluster dataCluster = request.getBody().dataCluster();
+
             if (a != null) {
                 List<Player> players = dataCluster.getPlayersServer(a.getServer());
 
@@ -85,13 +98,16 @@ public enum Power implements PowerAction {
                 int snowball = b1.getSnowball() / 2;
 
                 a.incSnowball(snowball)
+                        .setLastTakeSnowball(LocalDateTime.now())
                         .save(dataCluster.getPlayerRepository());
 
                 b1.incSnowball(-snowball)
                         .save(dataCluster.getPlayerRepository());
+
+                return EventResponse.of(Response.TAKE_SNOWBALL_THIEF);
             }
 
-            return super.action(a, b, dataCluster);
+            return super.action(request);
         }
     },
     FORTUNE(
@@ -101,8 +117,12 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150401658128441354/fortune.png"
     ) {
         @Override
-        public Event action(Player a, Player b, DataCluster dataCluster) {
-            if (a != null && b != null) {
+        public EventResponse action(EventRequest request) {
+            Player a = request.getBody().a();
+            Player b = request.getBody().b();
+            DataCluster dataCluster = request.getBody().dataCluster();
+
+            if (request.getType().equals(Request.THROW) && a != null && b != null) {
                 if (a.getSnowball() > 0) {
                     a.incSnowball(-1)
                             .incScore(20)
@@ -112,12 +132,19 @@ public enum Power implements PowerAction {
                     b.incScore(-5)
                             .save(dataCluster.getPlayerRepository());
 
-                    return Event.of(EventType.HIT);
+                    return EventResponse.of(Response.HIT);
                 } else
-                    return Event.of(EventType.SNOWBALL_LIMIT);
+                    return EventResponse.of(Response.SNOWBALL_LIMIT);
+            } else if (request.getType().equals(Request.TAKE) && a != null) {
+                a.incSnowball(5)
+                        .removeActive(this)
+                        .setLastTakeSnowball(LocalDateTime.now())
+                        .save(dataCluster.getPlayerRepository());
+
+                return EventResponse.of(Response.TAKE_SNOWBALL_FORTUNE);
             }
 
-            return super.action(a, b, dataCluster);
+            return super.action(request);
         }
     },
     SUPER_THROW(
@@ -127,7 +154,11 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150422914806595604/empty.png"
     ) {
         @Override
-        public Event action(Player a, Player b, DataCluster dataCluster) {
+        public EventResponse action(EventRequest request) {
+            Player a = request.getBody().a();
+            Player b = request.getBody().b();
+            DataCluster dataCluster = request.getBody().dataCluster();
+
             if (a != null) {
                 List<Player> players = dataCluster.getPlayersServer(a.getServer());
                 ArrayList<Player> playersB = new ArrayList<>();
@@ -145,10 +176,10 @@ public enum Power implements PowerAction {
                             .save(dataCluster.getPlayerRepository());
                 });
 
-                return Event.of(EventType.HIT_SUPER_THROW, playersB);
+                return EventResponse.of(Response.HIT_SUPER_THROW, playersB);
             }
 
-            return super.action(a, b, dataCluster);
+            return super.action(request);
         }
     },
     ENROLMENT(
@@ -158,10 +189,16 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150422914806595604/empty.png"
     ) {
         @Override
-        public Event action(Player a, Player b, DataCluster dataCluster) {
+        public EventResponse action(EventRequest request) {
+            Player a = request.getBody().a();
+            Player b = request.getBody().b();
+            DataCluster dataCluster = request.getBody().dataCluster();
+
             if (a != null && b != null) {
                 List<Player> players = dataCluster.getPlayersServer(a.getServer());
                 Player c = players.get(new Random().nextInt(players.size()));
+
+
 
                 if (b.getSnowball() > 0) {
                     a.incScore(10)
@@ -174,12 +211,12 @@ public enum Power implements PowerAction {
                     c.incScore(-10)
                             .save(dataCluster.getPlayerRepository());
 
-                    return Event.of(EventType.HIT_ENROLMENT, c);
+                    return EventResponse.of(Response.HIT_ENROLMENT, c);
                 } else
-                    return Event.of(EventType.MISSED_ENROLMENT, c);
+                    return EventResponse.of(Response.MISSED_ENROLMENT, c);
             }
 
-            return super.action(a, b, dataCluster);
+            return super.action(request);
         }
     },
     PACIFIER(

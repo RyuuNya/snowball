@@ -51,7 +51,7 @@ public class GiveCommand extends AbstractCommand {
 
             player.get().save(dataCluster.getPlayerRepository());
 
-            slash.reply("power was given").queue();
+            slash.reply("power was given").setEphemeral(true).queue();
         } else
             replyError(slash);
     }

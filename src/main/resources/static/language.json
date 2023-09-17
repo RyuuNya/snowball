@@ -26,6 +26,11 @@
             "ru": "Вы украли у игрока половину снежков"
         },
         {
+            "name": "take-snowball-fortune",
+            "en": "Luck is on your side, you picked up 5 snowballs",
+            "ru": "Удача на вашей стороне, вы подобрали 5 снежков"
+        },
+        {
             "name": "hit",
             "en": "> hits a snowball into <@",
             "ru": "> попадает снежком в <@"

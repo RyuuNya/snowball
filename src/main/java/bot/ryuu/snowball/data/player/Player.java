@@ -71,7 +71,7 @@ public class Player implements Comparable<Player> {
     }
 
     public Player removeActive(Power power) {
-        this.active = power;
+        this.active = null;
         this.powers.remove(power);
         return this;
     }

@@ -44,7 +44,7 @@ public class Bot {
                 new RandomCommand(dataCluster),
                 new RatingCommand(dataCluster),
 
-                //new GiveCommand(dataCluster),
+                new GiveCommand(dataCluster),
 
                 new HelpCommand(dataCluster),
                 new LanguageCommand(dataCluster),

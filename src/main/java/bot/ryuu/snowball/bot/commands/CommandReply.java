@@ -18,4 +18,11 @@ public interface CommandReply {
                         .setDescription("error occurred").build()
         ).queue();
     }
+
+    default void replyNon(SlashCommandInteractionEvent event) {
+        event.deferReply(true).setEmbeds(
+                Theme.getMainEmbed()
+                        .setDescription("This item of force does not apply to this action").build()
+        ).queue();
+    }
 }
