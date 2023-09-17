@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class ThrowCommand extends AbstractCommand {
@@ -28,6 +30,8 @@ public class ThrowCommand extends AbstractCommand {
                     .addOptions(
                             new OptionData(OptionType.STRING, "power", "power up")
                                     .addChoice("fortune", "FORTUNE")
+                                    .addChoice("super throw", "SUPER-THROW")
+                                    .addChoice("enrolment", "ENROLMENT")
                     )
                     .setGuildOnly(true)
         );
@@ -46,26 +50,54 @@ public class ThrowCommand extends AbstractCommand {
             if (activePower.isPresent())
                 switch (activePower.get()) {
                     case "FORTUNE" -> a.get().activatePower(Power.FORTUNE);
+                    case "ENROLMENT" -> a.get().activatePower(Power.ENROLMENT);
+                    case "SUPER-THROW" -> a.get().activatePower(Power.SUPER_THROW);
                 }
 
-            Event<String> event = EventAction.throwSnowball(a.get(), b.get(), dataCluster);
+            Event event = EventAction.throwSnowball(a.get(), b.get(), dataCluster);
 
             replySlash(slash, event, a.get(), b.get());
         } else
             replyError(slash);
     }
 
-    private void replySlash(SlashCommandInteractionEvent slash, Event<String> event, Player a, Player b) {
+    private void replySlash(SlashCommandInteractionEvent slash, Event event, Player a, Player b) {
         String message = Language.message("null", getLanguage(slash));
 
         switch (event.getType()) {
             case HIT ->
                     message = "<@" + a.getMember() + Language.message("hit", getLanguage(slash))
                             + b.getMember() + ">";
+            case HIT_SUPER_THROW -> {
+                    message = "<@" + a.getMember() + Language.message("hit", getLanguage(slash));
+
+                    List<Player> players = event.staticCast();
+
+                    for (Player player : Objects.requireNonNull(players)) {
+                        message += " <@" + player.getMember() + "> ";
+                    }
+            }
+            case HIT_ENROLMENT -> {
+                Player c = event.staticCast();
+
+                assert c != null;
+                message = "<@" + b.getMember() + Language.message("hit", getLanguage(slash))
+                        + c.getMember() + ">";
+            }
             case MISSED ->
                     message = "<@" + a.getMember() + Language.message("missed_1", getLanguage(slash))
                             + b.getMember() +
                             Language.message("missed_2", getLanguage(slash));
+            case MISSED_ENROLMENT -> {
+                    Player c = event.staticCast();
+
+                    assert c != null;
+
+                    message = "<@" + b.getMember() + Language.message("missed_1", getLanguage(slash))
+                            + c.getMember() +
+                            Language.message("missed_2", getLanguage(slash));
+            }
+
             case SNOWBALL_LIMIT ->
                     message = Language.message("snowball-empty", getLanguage(slash));
         }

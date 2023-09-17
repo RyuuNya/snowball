@@ -6,7 +6,7 @@ import bot.ryuu.snowball.data.player.PlayerRepository;
 import bot.ryuu.snowball.game.event.Event;
 
 public interface PowerAction {
-    default <T> Event<T> action(Player a, Player b, DataCluster dataCluster) {
+    default Event action(Player a, Player b, DataCluster dataCluster) {
         return Event.empty();
     }
 }

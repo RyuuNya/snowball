@@ -12,14 +12,27 @@ import net.dv8tion.jda.api.entities.User;
 import java.time.LocalDateTime;
 
 public class EventAction {
-    public static final int PROBABILITY_FORTUNE = 10;
-    public static final int PROBABILITY_BIG_BAGS = 40;
-    public static final int PROBABILITY_THIEF = 75;
-    public static final int PROBABILITY_BOOST = 95;
+    /*
+    * pacifier = 3%
+    * fortune = 5%
+    * enrolment = 10%
+    * super throw = 10%
+    * thief = 15%
+    * boost = 20%
+    * big bags = 37%
+    *
+    * */
+    public static final int PROBABILITY_PACIFIER = 3;
+    public static final int PROBABILITY_FORTUNE = 8;
+    public static final int PROBABILITY_ENROLMENT = 18;
+    public static final int PROBABILITY_SUPER_THROW = 28;
+    public static final int PROBABILITY_THIEF = 43;
+    public static final int PROBABILITY_BOOST = 63;
+    public static final int PROBABILITY_BIG_BAGS = 100;
 
     public static final int PROBABILITY_SHOT = 60;
 
-    public static <T> Event<T> takeSnowball(Player a, Player b, DataCluster dataCluster) {
+    public static Event takeSnowball(Player a, Player b, DataCluster dataCluster) {
         if (TimeStamp.isExecuteTakeSnowball(a.getLastTakeSnowball(), LocalDateTime.now()))
             return Event.of(EventType.TIMER_OVER);
         else if (a.isActive())
@@ -33,7 +46,7 @@ public class EventAction {
         }
     }
 
-    public static <T> Event<T> throwSnowball(Player a, Player b, DataCluster dataCluster) {
+    public static Event throwSnowball(Player a, Player b, DataCluster dataCluster) {
         if (a.isActive()) {
             return a.getActive().action(a, b, dataCluster);
         } else {
@@ -58,7 +71,7 @@ public class EventAction {
         }
     }
 
-    public static Event<Power> randomPower(Player a, DataCluster dataCluster) {
+    public static Event randomPower(Player a, DataCluster dataCluster) {
         if (TimeStamp.isExecuteRandomObjectPower(a.getLastRandomPower(), LocalDateTime.now()))
             return Event.of(EventType.TIMER_OVER);
 
@@ -90,14 +103,20 @@ public class EventAction {
     private static Power randomPower() {
         int random = (int) Math.ceil(Math.random() * 100);
 
-        if (random < PROBABILITY_FORTUNE)
+        if (random < PROBABILITY_PACIFIER)
+            return Power.PACIFIER;
+        else if (random < PROBABILITY_FORTUNE)
             return Power.FORTUNE;
-        else if (random < PROBABILITY_BIG_BAGS)
-            return Power.BIG_BAGS;
+        else if (random < PROBABILITY_ENROLMENT)
+            return Power.ENROLMENT;
+        else if (random < PROBABILITY_SUPER_THROW)
+            return Power.SUPER_THROW;
         else if (random < PROBABILITY_THIEF)
             return Power.THIEF;
         else if (random < PROBABILITY_BOOST)
             return Power.BOOST;
+        else if (random < PROBABILITY_BIG_BAGS)
+            return Power.BIG_BAGS;
         else
             return Power.PACIFIER;
     }

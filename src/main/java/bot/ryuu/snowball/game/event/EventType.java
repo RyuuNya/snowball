@@ -2,7 +2,10 @@ package bot.ryuu.snowball.game.event;
 
 public enum EventType {
     HIT,
+    HIT_ENROLMENT,
+    HIT_SUPER_THROW,
     MISSED,
+    MISSED_ENROLMENT,
 
     NEW_OBJECT,
 

@@ -23,6 +23,9 @@ public class PowersCommand extends AbstractCommand {
                                     .addChoice("big bags", "BIG_BAGS")
                                     .addChoice("boost", "BOOST")
                                     .addChoice("thief", "THIEF")
+                                    .addChoice("super throw", "SUPER-THROW")
+                                    .addChoice("pacifier", "PACIFIER")
+                                    .addChoice("enrolment", "ENROLMENT")
                     )
                     .setGuildOnly(true)
         );
@@ -39,6 +42,8 @@ public class PowersCommand extends AbstractCommand {
                 case "BIG_BAGS" -> p = Power.BIG_BAGS;
                 case "BOOST" -> p = Power.BOOST;
                 case "THIEF" -> p = Power.THIEF;
+                case "SUPER-THROW" -> p = Power.SUPER_THROW;
+                case "ENROLMENT" -> p = Power.ENROLMENT;
             }
 
         slash.deferReply(true).setEmbeds(

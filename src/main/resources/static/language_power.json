@@ -3,32 +3,44 @@
         {
             "name": "boost",
             "en": "You get more points for hitting a player",
-            "ru": "Вы получаете больше очков за попадание в игрока"
+            "ru": "Вы получаете больше очков за попадание в игрока",
+            "ja": "選手を打つとより多くの得点が得られる"
         },
         {
             "name": "big-bags",
             "en": "Allows you to pick up 3 snowballs at a time",
-            "ru": "Позволяет одновременно поднять 3 снежка"
+            "ru": "Позволяет одновременно поднять 3 снежка",
+            "ja": "3つの雪玉を同時に拾うことができる"
         },
         {
             "name": "thief",
             "en": "you steal snowballs from the user with the maximum number of snowballs",
-            "ru": "вы крадете снежки у пользователя с макс кол-вом снежков"
+            "ru": "вы крадете снежки у пользователя с макс кол-вом снежков",
+            "ja": "最大数の雪玉を持っているユーザーから雪玉を盗む。"
         },
         {
-            "name": "super throw",
+            "name": "super-throw",
             "en": "you throw all your snowballs at multiple users",
-            "ru": "вы бросаете все свои снежки в нескольких пользователей"
+            "ru": "вы бросаете все свои снежки в нескольких пользователей",
+            "ja": "複数のユーザーに雪玉を投げつける。"
+        },
+        {
+            "name": "enrolment",
+            "en": "You possess a player and throw a snowball at a random player for them",
+            "ru": "Вы вселяетесь в игрока и кидаете за него снежок в случайного игрока",
+            "ja": "プレイヤーに代わって、ランダムなプレイヤーに雪玉を投げつける。"
         },
         {
             "name": "fortune",
             "en": "Increases the chance of hitting a player to 100%",
-            "ru": "Повышает шанс попадания в игрока до 100%"
+            "ru": "Повышает шанс попадания в игрока до 100%",
+            "ja": "選手に当たる確率が100%になる"
         },
         {
             "name": "pacifier",
             "en": "Useless, but beautiful",
-            "ru": "Бесполезная, зато красивая"
+            "ru": "Бесполезная, зато красивая",
+            "ja": "役に立たないが、美しい。"
         }
     ]
 }

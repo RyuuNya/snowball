@@ -31,13 +31,13 @@ public class RandomCommand extends AbstractCommand {
         Optional<Player> player = getPlayer(slash);
 
         if (player.isPresent()) {
-            Event<Power> power = EventAction.randomPower(player.get(), dataCluster);
+            Power power = EventAction.randomPower(player.get(), dataCluster).staticCast();
 
-            if (power.isPresent())
+            if (power != null) {
                 slash.deferReply().setEmbeds(
-                        power.getValue().infoLanguage(slash.getUser().getId(), getLanguage(slash))
+                        power.infoLanguage(slash.getUser().getId(), getLanguage(slash))
                 ).queue();
-            else
+            } else
                 slash.deferReply(true).setEmbeds(
                         Theme.getMainEmbed()
                                 .setDescription(

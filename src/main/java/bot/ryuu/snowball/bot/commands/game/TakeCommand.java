@@ -51,14 +51,14 @@ public class TakeCommand extends AbstractCommand {
                     case "THIEF" -> a.get().activatePower(Power.THIEF);
                 }
 
-            Event<String> event = EventAction.takeSnowball(a.get(), null, dataCluster);
+            Event event = EventAction.takeSnowball(a.get(), null, dataCluster);
 
             replySlash(slash, event);
         } else
             replyError(slash);
     }
 
-    private void replySlash(SlashCommandInteractionEvent slash, Event<String> event) {
+    private void replySlash(SlashCommandInteractionEvent slash, Event event) {
         String message = Language.message("null", getLanguage(slash));
 
         switch (event.getType()) {

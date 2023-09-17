@@ -12,8 +12,7 @@ import lombok.Getter;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @Getter
 @AllArgsConstructor
@@ -25,7 +24,7 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150401657847431229/boost.png"
     ) {
         @Override
-        public <T> Event<T> action(Player a, Player b, DataCluster dataCluster) {
+        public Event action(Player a, Player b, DataCluster dataCluster) {
             if (a != null && b != null) {
                 if (EventAction.randomShot()) {
                     a.incScore(35)
@@ -56,7 +55,7 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150401657524453436/big_bags.png"
     ) {
         @Override
-        public <T> Event<T> action(Player a, Player b, DataCluster dataCluster) {
+        public Event action(Player a, Player b, DataCluster dataCluster) {
             if (a != null) {
                 a.incSnowball(3)
                         .setLastTakeSnowball(LocalDateTime.now())
@@ -76,7 +75,7 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150422042760466452/thief.png"
     ) {
         @Override
-        public <T> Event<T> action(Player a, Player b, DataCluster dataCluster) {
+        public Event action(Player a, Player b, DataCluster dataCluster) {
             if (a != null) {
                 List<Player> players = dataCluster.getPlayersServer(a.getServer());
 
@@ -102,17 +101,20 @@ public enum Power implements PowerAction {
             "https://media.discordapp.net/attachments/1150150954340061254/1150401658128441354/fortune.png"
     ) {
         @Override
-        public <T> Event<T> action(Player a, Player b, DataCluster dataCluster) {
+        public Event action(Player a, Player b, DataCluster dataCluster) {
             if (a != null && b != null) {
-                a.incSnowball(-1)
-                        .incScore(20)
-                        .removeActive(this)
-                        .save(dataCluster.getPlayerRepository());
+                if (a.getSnowball() > 0) {
+                    a.incSnowball(-1)
+                            .incScore(20)
+                            .removeActive(this)
+                            .save(dataCluster.getPlayerRepository());
 
-                b.incScore(-5)
-                        .save(dataCluster.getPlayerRepository());
+                    b.incScore(-5)
+                            .save(dataCluster.getPlayerRepository());
 
-                return Event.of(EventType.HIT);
+                    return Event.of(EventType.HIT);
+                } else
+                    return Event.of(EventType.SNOWBALL_LIMIT);
             }
 
             return super.action(a, b, dataCluster);
@@ -122,8 +124,64 @@ public enum Power implements PowerAction {
             "super throw",
             "you throw all your snowballs at multiple users",
             "super-throw",
-            "-"
-    ),
+            "https://media.discordapp.net/attachments/1150150954340061254/1150422914806595604/empty.png"
+    ) {
+        @Override
+        public Event action(Player a, Player b, DataCluster dataCluster) {
+            if (a != null) {
+                List<Player> players = dataCluster.getPlayersServer(a.getServer());
+                ArrayList<Player> playersB = new ArrayList<>();
+
+                for (int i = 0; i < a.getSnowball(); i++) {
+                    playersB.add(players.get(new Random().nextInt(players.size())));
+                }
+
+                a.incScore(25 * a.getSnowball())
+                        .incSnowball(-a.getSnowball())
+                        .save(dataCluster.getPlayerRepository());
+
+                playersB.forEach(player -> {
+                    player.incScore(-5)
+                            .save(dataCluster.getPlayerRepository());
+                });
+
+                return Event.of(EventType.HIT_SUPER_THROW, playersB);
+            }
+
+            return super.action(a, b, dataCluster);
+        }
+    },
+    ENROLMENT(
+            "enrolment",
+            "You possess a player and throw a snowball at a random player for them",
+            "enrolment",
+            "https://media.discordapp.net/attachments/1150150954340061254/1150422914806595604/empty.png"
+    ) {
+        @Override
+        public Event action(Player a, Player b, DataCluster dataCluster) {
+            if (a != null && b != null) {
+                List<Player> players = dataCluster.getPlayersServer(a.getServer());
+                Player c = players.get(new Random().nextInt(players.size()));
+
+                if (b.getSnowball() > 0) {
+                    a.incScore(10)
+                                    .save(dataCluster.getPlayerRepository());
+
+                    b.incSnowball(-1)
+                            .incScore(25)
+                            .save(dataCluster.getPlayerRepository());
+
+                    c.incScore(-10)
+                            .save(dataCluster.getPlayerRepository());
+
+                    return Event.of(EventType.HIT_ENROLMENT, c);
+                } else
+                    return Event.of(EventType.MISSED_ENROLMENT, c);
+            }
+
+            return super.action(a, b, dataCluster);
+        }
+    },
     PACIFIER(
             "pacifier",
             "useless, but beautiful",
