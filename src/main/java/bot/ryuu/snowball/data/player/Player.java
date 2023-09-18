@@ -1,6 +1,6 @@
 package bot.ryuu.snowball.data.player;
 
-import bot.ryuu.snowball.game.power.Power;
+import bot.ryuu.snowball.gamev2.power.Power;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Set;
 
 @Getter

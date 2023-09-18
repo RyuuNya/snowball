@@ -3,24 +3,19 @@ package bot.ryuu.snowball.bot.commands.game;
 import bot.ryuu.snowball.bot.commands.AbstractCommand;
 import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.player.Player;
-import bot.ryuu.snowball.game.EventAction;
-import bot.ryuu.snowball.game.event.Event;
-import bot.ryuu.snowball.game.event.request.EventRequest;
-import bot.ryuu.snowball.game.event.request.Request;
-import bot.ryuu.snowball.game.event.request.RequestBody;
-import bot.ryuu.snowball.game.event.response.EventResponse;
-import bot.ryuu.snowball.game.event.response.Response;
-import bot.ryuu.snowball.game.power.Power;
+import bot.ryuu.snowball.gamev2.GameAction;
+import bot.ryuu.snowball.gamev2.event.Param;
+import bot.ryuu.snowball.gamev2.event.request.EventRequest;
+import bot.ryuu.snowball.gamev2.event.request.Request;
+import bot.ryuu.snowball.gamev2.event.response.EventResponse;
 import bot.ryuu.snowball.language.Language;
 import bot.ryuu.snowball.theme.Theme;
 import bot.ryuu.snowball.theme.ThemeEmoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public class ThrowCommand extends AbstractCommand {
@@ -51,13 +46,23 @@ public class ThrowCommand extends AbstractCommand {
             boolean activate = true;
 
             if (activePower.isPresent())
-                activate = EventAction.activatePower(
-                        EventRequest.of(Request.TAKE, new RequestBody(a.get(), null, dataCluster), activePower.get())
-                );
-
+                activate = GameAction.execute(
+                        EventRequest.of(
+                                Request.THROW,
+                                new Param("a", a.get()),
+                                new Param("cluster", dataCluster)
+                        )
+                ).value("activate");
 
             if (activate) {
-                EventResponse event = EventAction.throwSnowball(a.get(), b.get(), dataCluster);
+                EventResponse event = GameAction.execute(
+                        EventRequest.of(
+                                Request.THROW,
+                                new Param("a", a.get()),
+                                new Param("b", b.get()),
+                                new Param("cluster", dataCluster)
+                        )
+                );
 
                 replySlash(slash, event, a.get(), b.get());
             } else
@@ -69,48 +74,41 @@ public class ThrowCommand extends AbstractCommand {
     private void replySlash(SlashCommandInteractionEvent slash, EventResponse event, Player a, Player b) {
         String message = Language.message("null", getLanguage(slash));
 
-        switch (event.getType()) {
+        switch (event.type()) {
             case HIT ->
                     message = "<@" + a.getMember() + Language.message("hit", getLanguage(slash))
                             + b.getMember() + ">";
             case HIT_SUPER_THROW -> {
                     message = "<@" + a.getMember() + Language.message("hit", getLanguage(slash));
 
-                    List<Player> players = event.staticCast();
+                    List<Player> players = event.value("players");
 
-                    for (Player player : Objects.requireNonNull(players)) {
+                    for (Player player : players) {
                         message += " <@" + player.getMember() + "> ";
                     }
             }
             case HIT_ENROLMENT -> {
-                Player c = event.staticCast();
+                    Player c = event.value("c");
 
-                assert c != null;
-                message = "<@" + b.getMember() + Language.message("hit", getLanguage(slash))
-                        + c.getMember() + ">";
+                    assert c != null;
+                    message = "<@" + b.getMember() + Language.message("hit", getLanguage(slash))
+                            + c.getMember() + ">";
             }
             case MISSED ->
                     message = "<@" + a.getMember() + Language.message("missed_1", getLanguage(slash))
-                            + b.getMember() +
-                            Language.message("missed_2", getLanguage(slash));
+                            + b.getMember() + Language.message("missed_2", getLanguage(slash));
             case MISSED_ENROLMENT -> {
-                    Player c = event.staticCast();
+                    Player c = event.value("c");
 
                     assert c != null;
-
-                    message = "<@" + b.getMember() + Language.message("missed_1", getLanguage(slash))
-                            + c.getMember() +
-                            Language.message("missed_2", getLanguage(slash));
+                message = "<@" + b.getMember() + Language.message("missed_1", getLanguage(slash))
+                        + c.getMember() + Language.message("missed_2", getLanguage(slash));
             }
-
             case SNOWBALL_LIMIT ->
                     message = Language.message("snowball-empty", getLanguage(slash));
         }
 
-        slash.deferReply(!(event.getType() == Response.MISSED || event.getType() == Response.HIT)).setContent(
-                (event.getType() == Response.HIT || event.getType() == Response.MISSED) ?
-                        "<@" + b.getMember() + ">" : ""
-        ).setEmbeds(
+        slash.deferReply().setEmbeds(
                 Theme.getMainEmbed()
                         .setDescription(
                                 ThemeEmoji.THROW.getEmoji().getAsMention() + " " +

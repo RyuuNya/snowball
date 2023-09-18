@@ -2,11 +2,9 @@ package bot.ryuu.snowball.bot.commands.game;
 
 import bot.ryuu.snowball.bot.commands.AbstractCommand;
 import bot.ryuu.snowball.data.DataCluster;
-import bot.ryuu.snowball.game.power.Power;
+import bot.ryuu.snowball.gamev2.power.Power;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.Optional;
 

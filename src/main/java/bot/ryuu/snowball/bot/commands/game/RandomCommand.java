@@ -3,10 +3,12 @@ package bot.ryuu.snowball.bot.commands.game;
 import bot.ryuu.snowball.bot.commands.AbstractCommand;
 import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.player.Player;
-import bot.ryuu.snowball.game.EventAction;
-import bot.ryuu.snowball.game.TimeStamp;
-import bot.ryuu.snowball.game.event.Event;
-import bot.ryuu.snowball.game.power.Power;
+import bot.ryuu.snowball.gamev2.GameAction;
+import bot.ryuu.snowball.gamev2.Time;
+import bot.ryuu.snowball.gamev2.event.Param;
+import bot.ryuu.snowball.gamev2.event.request.EventRequest;
+import bot.ryuu.snowball.gamev2.event.request.Request;
+import bot.ryuu.snowball.gamev2.power.Power;
 import bot.ryuu.snowball.language.Language;
 import bot.ryuu.snowball.theme.Theme;
 import bot.ryuu.snowball.theme.ThemeEmoji;
@@ -34,7 +36,13 @@ public class RandomCommand extends AbstractCommand {
         Optional<Player> player = getPlayer(slash);
 
         if (player.isPresent()) {
-            Power power = EventAction.randomPower(player.get(), dataCluster).staticCast();
+            Power power = GameAction.execute(
+                    EventRequest.of(
+                            Request.RANDOM,
+                            new Param("a", player.get()),
+                            new Param("cluster", dataCluster)
+                    )
+            ).value("power");
 
             if (power != null) {
                 slash.deferReply().setEmbeds(
@@ -46,7 +54,7 @@ public class RandomCommand extends AbstractCommand {
                                 .setDescription(
                                         ThemeEmoji.TIMER.getEmoji().getAsMention() + " " +
                                                 Language.message("time-over-random_1", getLanguage(slash)) +
-                                                TimeStamp.TIMESTAMP_RANDOM_POWER +
+                                                Time.TIMESTAMP_RANDOM_POWER +
                                                 Language.message("time-over-random_2", getLanguage(slash)))
                                 .build()
                 ).queue();
