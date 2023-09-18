@@ -92,7 +92,7 @@ public interface GameAction {
         else if (Time.isExecuteRandomPower(a.getLastRandomPower(), LocalDateTime.now()))
             return EventResponse.of(Response.TIMER_OVER);
         else {
-            Power power = GameRandom.randomPower();
+            Power power = GameRandom.randomPowerV2();
 
             a.addPower(power)
                     .setLastRandomPower(LocalDateTime.now())
