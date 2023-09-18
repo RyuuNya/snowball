@@ -1,4 +1,4 @@
-package bot.ryuu.snowball.game.event.request;
+package bot.ryuu.snowball.gamev2.event.request;
 
 public enum Request {
     RANDOM,

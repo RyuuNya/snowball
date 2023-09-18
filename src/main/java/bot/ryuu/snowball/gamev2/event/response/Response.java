@@ -1,4 +1,4 @@
-package bot.ryuu.snowball.game.event.response;
+package bot.ryuu.snowball.gamev2.event.response;
 
 public enum Response {
     HIT,
@@ -17,5 +17,5 @@ public enum Response {
     TAKE_SNOWBALL_THIEF,
 
     SNOWBALL_LIMIT,
-    TAKE_SNOWBALL_FORTUNE, TIMER_OVER
+    TAKE_SNOWBALL_FORTUNE, STATS, ACTIVATE, TIMER_OVER
 }
