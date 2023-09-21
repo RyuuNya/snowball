@@ -72,7 +72,7 @@ public interface GameAction {
 
                 return EventResponse.of(Response.HIT);
             } else if (a.getSnowball() <= 0)
-                return EventResponse.of(Response.SNOWBALL_LIMIT);
+                return EventResponse.of(Response.THROW_SNOWBALL_LIMIT);
             else {
                 a
                         .incSnowball(-1)
@@ -99,7 +99,7 @@ public interface GameAction {
                     .save(cluster.getPlayerRepository());
 
             return EventResponse.of(
-                    Response.NEW_OBJECT,
+                    Response.RANDOM,
                     new Param("power", power)
             );
         }

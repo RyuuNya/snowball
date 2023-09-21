@@ -139,7 +139,7 @@ public enum Power implements PowerAction {
 
                     return EventResponse.of(Response.HIT);
                 } else
-                    return EventResponse.of(Response.SNOWBALL_LIMIT);
+                    return EventResponse.of(Response.THROW_SNOWBALL_LIMIT);
             } else if (request.type().equals(Request.TAKE) && a != null && cluster != null) {
                 a.incSnowball(5)
                         .removeActive(this)

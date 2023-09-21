@@ -9,6 +9,8 @@ import bot.ryuu.snowball.gamev2.event.request.EventRequest;
 import bot.ryuu.snowball.gamev2.event.request.Request;
 import bot.ryuu.snowball.gamev2.event.response.EventResponse;
 import bot.ryuu.snowball.language.Language;
+import bot.ryuu.snowball.language.LanguageV2;
+import bot.ryuu.snowball.language.Type;
 import bot.ryuu.snowball.theme.Theme;
 import bot.ryuu.snowball.theme.ThemeEmoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -72,7 +74,7 @@ public class ThrowCommand extends AbstractCommand {
     }
 
     private void replySlash(SlashCommandInteractionEvent slash, EventResponse event, Player a, Player b) {
-        String message = Language.message("null", getLanguage(slash));
+        String message = LanguageV2.message("NULL", Type.EN);
 
         switch (event.type()) {
             case HIT ->
@@ -104,7 +106,7 @@ public class ThrowCommand extends AbstractCommand {
                 message = "<@" + b.getMember() + Language.message("missed_1", getLanguage(slash))
                         + c.getMember() + Language.message("missed_2", getLanguage(slash));
             }
-            case SNOWBALL_LIMIT ->
+            case THROW_SNOWBALL_LIMIT ->
                     message = Language.message("snowball-empty", getLanguage(slash));
         }
 

@@ -9,7 +9,8 @@ import bot.ryuu.snowball.gamev2.event.Param;
 import bot.ryuu.snowball.gamev2.event.request.EventRequest;
 import bot.ryuu.snowball.gamev2.event.request.Request;
 import bot.ryuu.snowball.gamev2.event.response.EventResponse;
-import bot.ryuu.snowball.language.Language;
+import bot.ryuu.snowball.language.LanguageV2;
+import bot.ryuu.snowball.language.Type;
 import bot.ryuu.snowball.theme.Theme;
 import bot.ryuu.snowball.theme.ThemeEmoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -69,20 +70,21 @@ public class TakeCommand extends AbstractCommand {
     }
 
     private void replySlash(SlashCommandInteractionEvent slash, EventResponse event) {
-        String message = Language.message("null", getLanguage(slash));
+        String message = LanguageV2.message("NULL", Type.EN);
 
         switch (event.type()) {
             case TAKE_SNOWBALL ->
-                    message = Language.message("take-snowball", getLanguage(slash));
+                    message = LanguageV2.message("TAKE_SNOWBALL", Type.EN);
             case TAKE_SNOWBALL_BIG_BAGS ->
-                    message = Language.message("take-snowball-big-bags", getLanguage(slash));
+                    message = LanguageV2.message("TAKE_SNOWBALL_BIG_BAGS", Type.EN);
             case TAKE_SNOWBALL_THIEF ->
-                    message = Language.message("take-snowball-thief", getLanguage(slash));
+                    message = LanguageV2.message("TAKE_SNOWBALL_THIEF", Type.EN);
             case TAKE_SNOWBALL_FORTUNE ->
-                    message = Language.message("take-snowball-fortune", getLanguage(slash));
-            case TIMER_OVER -> message =
-                    Language.message("time-over-take_1", getLanguage(slash))
-                            + Time.TIMESTAMP_TAKE_SNOWBALL + Language.message("time-over-take_2", getLanguage(slash));
+                    message = LanguageV2.message("TAKE_SNOWBALL_FORTUNE", Type.EN);
+            case TIMER_OVER ->
+                    message = LanguageV2.message("TAKE_SNOWBALL_TIME_OVER_1", Type.EN)
+                            + Time.TIMESTAMP_TAKE_SNOWBALL
+                            + LanguageV2.message("TAKE_SNOWBALL_TIME_OVER_2", Type.EN);
 
         }
 

@@ -2,8 +2,6 @@ package bot.ryuu.snowball.gamev2;
 
 import bot.ryuu.snowball.gamev2.power.Power;
 
-import java.util.Random;
-
 public interface GameRandom {
     int PROBABILITY_PACIFIER = 3;
     int PROBABILITY_FORTUNE = 8;

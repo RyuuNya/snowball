@@ -3,6 +3,7 @@ package bot.ryuu.snowball.bot.commands;
 import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.player.Player;
 import bot.ryuu.snowball.data.server.Server;
+import bot.ryuu.snowball.language.Type;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
