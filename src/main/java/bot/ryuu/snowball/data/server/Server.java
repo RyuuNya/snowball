@@ -1,12 +1,12 @@
 package bot.ryuu.snowball.data.server;
 
+import bot.ryuu.snowball.data.DataCluster;
+import bot.ryuu.snowball.tools.language.Language;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+@Setter
 @Getter
 @Entity
 @Builder
@@ -16,14 +16,14 @@ public class Server {
     @Id
     private String id;
 
-    private String language;
+    private Language language;
 
-    public Server setLanguage(String language) {
+    public Server setLanguage(Language language) {
         this.language = language;
         return this;
     }
 
-    public void save(ServerRepository serverRepository) {
-        serverRepository.save(this);
+    public void save(DataCluster cluster) {
+        cluster.getServerRepository().save(this);
     }
 }

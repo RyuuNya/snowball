@@ -1,6 +1,6 @@
 package bot.ryuu.snowball.bot.listener;
 
-import bot.ryuu.snowball.bot.commands.AbstractCommand;
+import bot.ryuu.snowball.bot.commands.CommandAbstract;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -12,9 +12,9 @@ import java.util.Objects;
 
 @Setter
 public class GameCommandListener extends ListenerAdapter {
-    private List<AbstractCommand> commands;
+    private List<CommandAbstract> commands;
 
-    public GameCommandListener(List<AbstractCommand> commands) {
+    public GameCommandListener(List<CommandAbstract> commands) {
         setCommands(commands);
     }
 
@@ -22,8 +22,8 @@ public class GameCommandListener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         super.onButtonInteraction(event);
 
-        for (AbstractCommand command : commands) {
-            if (Objects.requireNonNull(event.getButton().getId()).contains(command.getCommandData().getName())) {
+        for (CommandAbstract command : commands) {
+            if (Objects.requireNonNull(event.getButton().getId()).contains(command.getCommand().getName())) {
                 command.execute(event);
             }
         }
@@ -33,8 +33,8 @@ public class GameCommandListener extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         super.onSlashCommandInteraction(event);
 
-        for (AbstractCommand command : commands) {
-            if (event.getName().equals(command.getCommandData().getName())) {
+        for (CommandAbstract command : commands) {
+            if (event.getName().equals(command.getCommand().getName())) {
                 command.execute(event);
             }
         }

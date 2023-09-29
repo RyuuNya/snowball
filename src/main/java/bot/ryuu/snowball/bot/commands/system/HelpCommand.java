@@ -1,39 +1,40 @@
 package bot.ryuu.snowball.bot.commands.system;
 
-import bot.ryuu.snowball.bot.commands.AbstractCommand;
+import bot.ryuu.snowball.bot.commands.CommandAbstract;
 import bot.ryuu.snowball.data.DataCluster;
-import bot.ryuu.snowball.language.Language;
-import bot.ryuu.snowball.theme.Theme;
+import bot.ryuu.snowball.tools.Theme;
+import bot.ryuu.snowball.tools.language.Messages;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-public class HelpCommand extends AbstractCommand {
-    public HelpCommand(DataCluster dataCluster) {
-        super(dataCluster);
+public class HelpCommand extends CommandAbstract {
+
+    public HelpCommand(DataCluster cluster) {
+        super(cluster);
 
         setCode("_help_command");
-        setCommandData(
+        setCommand(
                 Commands.slash("help", "a list of all commands and the game's startup")
-                    .setGuildOnly(true)
+                        .setGuildOnly(true)
         );
     }
 
     @Override
-    protected void slashInteraction(SlashCommandInteractionEvent slash) {
+    public void slashInteraction(SlashCommandInteractionEvent slash) {
         super.slashInteraction(slash);
 
         slash.deferReply(true).setEmbeds(
-                Theme.getMainEmbed()
+                Theme.main()
                         .setDescription(
-                                Language.message("help_1", getLanguage(slash))
+                                Messages.message("HELP_1", lang(slash))
                         ).build(),
-                Theme.getMainEmbed()
+                Theme.main()
                         .setDescription(
-                                Language.message("help_2", getLanguage(slash))
+                                Messages.message("HELP_2", lang(slash))
                         )
                         .addField(
-                                Language.message("help_3-title", getLanguage(slash)),
-                                Language.message("help_3", getLanguage(slash)),
+                                Messages.message("HELP_3_TITLE", lang(slash)),
+                                Messages.message("HELP_3", lang(slash)),
                                 false
                         ).build()
         ).queue();

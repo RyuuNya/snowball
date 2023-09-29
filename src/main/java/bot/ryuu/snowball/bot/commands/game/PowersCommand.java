@@ -1,44 +1,40 @@
 package bot.ryuu.snowball.bot.commands.game;
 
-import bot.ryuu.snowball.bot.commands.AbstractCommand;
+import bot.ryuu.snowball.bot.commands.CommandAbstract;
 import bot.ryuu.snowball.data.DataCluster;
-import bot.ryuu.snowball.gamev2.power.Power;
+import bot.ryuu.snowball.game.power.Power;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.Optional;
 
-public class PowersCommand extends AbstractCommand {
-    public PowersCommand(DataCluster dataCluster) {
-        super(dataCluster);
+public class PowersCommand extends CommandAbstract {
+    public PowersCommand(DataCluster cluster) {
+        super(cluster);
 
         setCode("_powers_command");
-        setCommandData(
+        setCommand(
                 Commands.slash("powers", "all-power information")
-                    .addOptions(
-                            getPowerOption(true)
-                    )
-                    .setGuildOnly(true)
+                        .addOptions(
+                                getPowerOption(true)
+                        )
+                        .setGuildOnly(true)
         );
     }
 
     @Override
     protected void slashInteraction(SlashCommandInteractionEvent slash) {
-        Optional<String> power = getOptionString(slash, "power");
+        super.slashInteraction(slash);
 
-        Power p = Power.PACIFIER;
-        if (power.isPresent())
-            switch (power.get()) {
-                case "FORTUNE" -> p = Power.FORTUNE;
-                case "BIG_BAGS" -> p = Power.BIG_BAGS;
-                case "BOOST" -> p = Power.BOOST;
-                case "THIEF" -> p = Power.THIEF;
-                case "SUPER-THROW" -> p = Power.SUPER_THROW;
-                case "ENROLMENT" -> p = Power.ENROLMENT;
-            }
+        Optional<String> power = getOption(slash, "power");
 
-        slash.deferReply(true).setEmbeds(
-                p.infoCommandLanguage(getLanguage(slash))
-        ).queue();
+        if (power.isPresent()) {
+            Power p = Power.valueOf(power.get().toUpperCase());
+
+            slash.deferReply(true).setEmbeds(
+                    p.info(lang(slash))
+            ).queue();
+        } else
+            replyError(slash);
     }
 }

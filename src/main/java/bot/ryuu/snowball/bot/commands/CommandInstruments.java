@@ -1,34 +1,27 @@
 package bot.ryuu.snowball.bot.commands;
 
-import bot.ryuu.snowball.data.player.Player;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 import java.util.Optional;
 
 public interface CommandInstruments {
-    Optional<Player> getPlayer(SlashCommandInteractionEvent event);
-
-    Optional<Player> getPlayer(String member, String server);
-
-    Optional<Player> getPlayer(Optional<String> member, String server);
-
-    String getLanguage(SlashCommandInteractionEvent event);
-
-    String getLanguage(ButtonInteractionEvent event);
-
-    default Optional<String> getOptionString(SlashCommandInteractionEvent event, String option) {
-        if (event.getOption(option) != null)
-            return Optional.of(event.getOption(option).getAsString());
-        else
+    default <T> Optional<T> getOption(SlashCommandInteractionEvent slash, String name) {
+        if (slash.getOption(name) == null)
             return Optional.empty();
-    };
 
-    default Optional<User> getOptionUser(SlashCommandInteractionEvent event, String option) {
-        if (event.getOption(option) != null)
-            return Optional.of(event.getOption(option).getAsUser());
-        else
-            return Optional.empty();
-    };
+        switch (slash.getOption(name).getType()) {
+            case STRING -> {
+                return Optional.of((T) slash.getOption(name).getAsString());
+            }
+            case USER -> {
+                return Optional.of((T) slash.getOption(name).getAsUser());
+            }
+            case ROLE -> {
+                return Optional.of((T) slash.getOption(name).getAsRole());
+            }
+            default -> {
+                return Optional.empty();
+            }
+        }
+    }
 }

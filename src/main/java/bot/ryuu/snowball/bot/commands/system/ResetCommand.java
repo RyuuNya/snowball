@@ -1,24 +1,24 @@
 package bot.ryuu.snowball.bot.commands.system;
 
-import bot.ryuu.snowball.bot.commands.AbstractCommand;
+import bot.ryuu.snowball.bot.commands.CommandAbstract;
 import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.player.Player;
-import bot.ryuu.snowball.language.Language;
-import bot.ryuu.snowball.theme.Theme;
+import bot.ryuu.snowball.tools.Theme;
+import bot.ryuu.snowball.tools.language.Messages;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
 import java.util.HashSet;
 import java.util.List;
 
-public class ResetCommand extends AbstractCommand {
-    public ResetCommand(DataCluster dataCluster) {
-        super(dataCluster);
+public class ResetCommand extends CommandAbstract {
+    public ResetCommand(DataCluster cluster) {
+        super(cluster);
 
         setCode("_reset_command");
-        setCommandData(
+        setCommand(
                 Commands.slash("reset", "resets all users")
-                    .setGuildOnly(true)
+                        .setGuildOnly(true)
         );
     }
 
@@ -26,7 +26,7 @@ public class ResetCommand extends AbstractCommand {
     protected void slashInteraction(SlashCommandInteractionEvent slash) {
         super.slashInteraction(slash);
 
-        List<Player> players = dataCluster.getPlayersServer(slash);
+        List<Player> players = cluster.getPlayers(slash.getGuild().getId());
 
         players.forEach(player -> {
             player.setScore(0);
@@ -35,12 +35,12 @@ public class ResetCommand extends AbstractCommand {
             player.setSnowball(0);
         });
 
-        dataCluster.savePlayerAll(players);
+        cluster.savePlayers(players);
 
         slash.deferReply(true).setEmbeds(
-                Theme.getMainEmbed()
+                Theme.main()
                         .setDescription(
-                                Language.message("server-reset", getLanguage(slash))
+                                Messages.message("SERVER_RESET", lang(slash))
                         ).build()
         ).queue();
     }
