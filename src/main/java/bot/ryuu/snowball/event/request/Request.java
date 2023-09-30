@@ -5,7 +5,8 @@ public enum Request {
     THROW,
     STATS,
     NULL,
-    ACTIVATE,
     ERROR,
+    ACTIVATE,
+    POWER,
     RANDOM
 }

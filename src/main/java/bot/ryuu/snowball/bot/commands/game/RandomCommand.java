@@ -26,7 +26,7 @@ public class RandomCommand extends CommandAbstract {
         setCommand(
                 Commands.slash("random", "random object of power")
                         .addOptions(
-                                getPowerOption(false)
+                                getOptionPower(Request.RANDOM, false)
                         )
                         .setGuildOnly(true)
         );

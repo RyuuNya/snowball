@@ -2,6 +2,7 @@ package bot.ryuu.snowball.bot.commands;
 
 import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.server.Server;
+import bot.ryuu.snowball.event.request.Request;
 import bot.ryuu.snowball.tools.language.Language;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,10 +12,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
+import java.awt.*;
 import java.util.Optional;
 
 @Getter
@@ -65,15 +68,30 @@ public abstract class CommandAbstract implements CommandInstruments, CommandRepl
 
     }
 
-    protected OptionData getPowerOption(Boolean required) {
-        return new OptionData(OptionType.STRING, "power", "subject that interests you", required)
-                .addChoice("fortune", "FORTUNE")
-                .addChoice("big bags", "BIG_BAGS")
-                .addChoice("boost", "BOOST")
-                .addChoice("thief", "THIEF")
-                .addChoice("super throw", "SUPER_THROW")
-                .addChoice("pacifier", "PACIFIER")
-                .addChoice("enrolment", "ENROLMENT");
+    protected OptionData getOptionPower(Request request, boolean required) {
+        OptionData option = new OptionData(OptionType.STRING, "power", "subject that interests you", required);
+
+        switch (request) {
+            case TAKE -> option.addChoice("Fortune", "FORTUNE")
+                    .addChoice("Big bags", "BIG_BAGS")
+                    .addChoice("Thief", "THIEF")
+                    .addChoice("Boost", "BOOST");
+
+            case THROW -> option.addChoice("Fortune", "FORTUNE")
+                    .addChoice("Boost", "BOOST")
+                    .addChoice("Enrolment", "ENROLMENT")
+                    .addChoice("Super throw", "SUPER_THROW");
+
+            case POWER -> option.addChoice("Fortune", "FORTUNE")
+                    .addChoice("Big bags", "BIG_BAGS")
+                    .addChoice("Thief", "THIEF")
+                    .addChoice("Boost", "BOOST")
+                    .addChoice("Enrolment", "ENROLMENT")
+                    .addChoice("Pacifier", "PACIFIER")
+                    .addChoice("Super throw", "SUPER_THROW");
+        }
+
+        return option;
     }
 
     public Language lang(SlashCommandInteractionEvent slash) {

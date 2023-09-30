@@ -11,8 +11,9 @@ import java.util.Optional;
 
 public interface Registration {
     static Optional<Player> register(User user, Guild guild, DataCluster cluster) {
+        System.out.println("Registration " + user.getName() + " " + guild.getName());
+
         Player player = Player.builder()
-                .id(user.getId())
                 .member(user.getId())
                 .server(guild.getId())
                 .powers(new HashSet<>())

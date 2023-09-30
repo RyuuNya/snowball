@@ -9,6 +9,7 @@ import bot.ryuu.snowball.event.request.Request;
 import bot.ryuu.snowball.event.response.EventResponse;
 import bot.ryuu.snowball.game.GameAction;
 import bot.ryuu.snowball.game.Time;
+import bot.ryuu.snowball.game.power.Power;
 import bot.ryuu.snowball.tools.Theme;
 import bot.ryuu.snowball.tools.language.Language;
 import bot.ryuu.snowball.tools.language.Messages;
@@ -28,7 +29,7 @@ public class TakeCommand extends CommandAbstract {
         setCommand(
                 Commands.slash("take", "to take one snowball")
                         .addOptions(
-                                getPowerOption(false)
+                                getOptionPower(Request.TAKE, false)
                         )
                         .setGuildOnly(true)
         );
@@ -46,17 +47,14 @@ public class TakeCommand extends CommandAbstract {
         }
 
         if (a.isPresent()) {
-            boolean activate = true;
-            if (activePower.isPresent())
-                activate = GameAction.execute(
-                        EventRequest.of(
-                                Request.ACTIVATE,
-                                new Param("action", Request.TAKE),
-                                new Param("a", a.get()),
-                                new Param("power", activePower.get()),
-                                new Param("cluster", cluster)
-                        )
-                ).valueNoOptional("activate");
+            boolean activate = GameAction.execute(
+                    EventRequest.of(
+                            Request.ACTIVATE,
+                            new Param("a", a.get()),
+                            new Param("power", Power.valueOf(activePower.orElse("NULL"))),
+                            new Param("cluster", cluster)
+                    )
+            ).valueNoOptional("activate");
 
             if (activate) {
                 EventResponse event = GameAction.execute(
@@ -69,9 +67,9 @@ public class TakeCommand extends CommandAbstract {
 
                 replySlash(slash, event);
             } else
-                replyNon(slash);
+                replyActivate(slash, lang(slash));
         } else
-            replyError(slash);
+            replyError(slash, lang(slash));
     }
 
     private void replySlash(SlashCommandInteractionEvent slash, EventResponse event) {

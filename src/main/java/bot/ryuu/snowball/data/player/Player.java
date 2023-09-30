@@ -20,6 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class Player implements Comparable<Player> {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
     private String member;
@@ -54,7 +55,8 @@ public class Player implements Comparable<Player> {
     }
 
     public Player activate(Power power) {
-        this.active = power;
+        if (this.powers.contains(power))
+            this.active = power;
         this.powers.remove(power);
         return this;
     }

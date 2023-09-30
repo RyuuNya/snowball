@@ -261,6 +261,13 @@ public enum Power implements PowerAction {
             Rarity.LEGENDARY,
             "PACIFIER",
             "https://media.discordapp.net/attachments/1150150954340061254/1150422914806595604/empty.png"
+    ),
+    NULL(
+            "null",
+            "null",
+            Rarity.USUAL,
+            "null",
+            "null"
     );
 
     private final String name;

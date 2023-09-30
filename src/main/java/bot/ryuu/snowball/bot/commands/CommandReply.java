@@ -7,24 +7,17 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 public interface CommandReply {
-    default void replyError(SlashCommandInteractionEvent event) {
-        event.deferReply(true).setEmbeds(
+    default void replyError(SlashCommandInteractionEvent slash, Language lang) {
+        slash.deferReply(true).setEmbeds(
                 Theme.error()
-                        .setDescription("error occurred").build()
+                        .setDescription(Messages.message("ERROR", lang)).build()
         ).queue();
     }
 
-    default void replyError(ButtonInteractionEvent event) {
-        event.deferReply(true).setEmbeds(
-                Theme.error()
-                        .setDescription("error occurred").build()
-        ).queue();
-    }
-
-    default void replyNon(SlashCommandInteractionEvent event) {
-        event.deferReply(true).setEmbeds(
-                Theme.main()
-                        .setDescription("This item of force does not apply to this action").build()
+    default void replyActivate(SlashCommandInteractionEvent slash, Language lang) {
+        slash.deferReply(true).setEmbeds(
+                Theme.await()
+                        .setDescription(Messages.message("ACTIVATE", lang)).build()
         ).queue();
     }
 }

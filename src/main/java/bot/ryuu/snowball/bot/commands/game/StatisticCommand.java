@@ -46,6 +46,6 @@ public class StatisticCommand extends CommandAbstract {
 
             slash.deferReply(true).setEmbeds(embed).queue();
         } else
-            replyError(slash);
+            replyError(slash, lang(slash));
     }
 }

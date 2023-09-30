@@ -4,7 +4,6 @@ import bot.ryuu.snowball.data.DataCluster;
 import bot.ryuu.snowball.data.player.Player;
 import bot.ryuu.snowball.event.Param;
 import bot.ryuu.snowball.event.request.EventRequest;
-import bot.ryuu.snowball.event.request.Request;
 import bot.ryuu.snowball.event.response.EventResponse;
 import bot.ryuu.snowball.event.response.Response;
 import bot.ryuu.snowball.game.power.Power;
@@ -12,10 +11,7 @@ import bot.ryuu.snowball.game.random.GameRandom;
 import bot.ryuu.snowball.tools.Theme;
 import net.dv8tion.jda.api.entities.User;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
-
-import static bot.ryuu.snowball.event.request.Request.TAKE;
 
 public interface GameAction {
     static EventResponse execute(EventRequest request) {
@@ -134,31 +130,20 @@ public interface GameAction {
 
     private static EventResponse activatePower(EventRequest request) {
         Optional<Player> a = request.value("a");
-        Optional<Request> action = request.value("action");
+        Optional<Power> power = request.value("power");
         Optional<DataCluster> cluster = request.value("cluster");
-        Power power = Power.valueOf((String) request.value("power").get());
-
-        if (a.isEmpty() || cluster.isEmpty() || action.isEmpty())
-            return EventResponse.empty();
 
         boolean activate = false;
 
-        switch (action.get()) {
-            case TAKE -> {
-                switch (power) {
-                    case FORTUNE, BIG_BAGS, THIEF, BOOST -> activate = true;
-                }
+        if (a.isPresent() && power.isPresent() && cluster.isPresent()) {
+            if (a.get().containPower(power.get())) {
+                a.get().activate(power.get())
+                        .save(cluster.get());
+                activate = true;
             }
-            case THROW -> {
-                switch (power) {
-                    case FORTUNE, ENROLMENT, BOOST, SUPER_THROW -> activate = true;
-                }
-            }
-        }
 
-        if (activate)
-            a.get().activate(power)
-                    .save(cluster.get());
+            activate = power.get() == Power.NULL;
+        }
 
         return EventResponse.of(
                 Response.ACTIVATE,

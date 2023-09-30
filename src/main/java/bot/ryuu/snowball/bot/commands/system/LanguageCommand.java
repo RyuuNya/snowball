@@ -49,6 +49,6 @@ public class LanguageCommand extends CommandAbstract {
                             .setDescription(Messages.message("SERVER_LANG", lang(slash))).build()
             ).queue();
         } else
-            replyError(slash);
+            replyError(slash, lang(slash));
     }
 }

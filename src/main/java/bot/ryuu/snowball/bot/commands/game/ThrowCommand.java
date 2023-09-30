@@ -8,6 +8,7 @@ import bot.ryuu.snowball.event.request.EventRequest;
 import bot.ryuu.snowball.event.request.Request;
 import bot.ryuu.snowball.event.response.EventResponse;
 import bot.ryuu.snowball.game.GameAction;
+import bot.ryuu.snowball.game.power.Power;
 import bot.ryuu.snowball.tools.Theme;
 import bot.ryuu.snowball.tools.language.Language;
 import bot.ryuu.snowball.tools.language.Messages;
@@ -30,7 +31,7 @@ public class ThrowCommand extends CommandAbstract {
                 Commands.slash("throw", "throw a snowball at a player")
                         .addOption(OptionType.USER, "user", "user you want to throw a snowball at", true)
                         .addOptions(
-                                getPowerOption(false)
+                                getOptionPower(Request.THROW, false)
                         )
                         .setGuildOnly(true)
         );
@@ -45,25 +46,24 @@ public class ThrowCommand extends CommandAbstract {
         Optional<Player> a = cluster.getPlayer(slash);
         Optional<Player> b = cluster.getPlayer(u.get().getId(), slash.getGuild().getId());
 
-        if (a.isEmpty() || b.isEmpty()) {
-            a = Registration.register(slash.getUser(), slash.getGuild(), cluster);
-            b = Registration.register(u.get(), slash.getGuild(), cluster);
-        }
-
         Optional<String> activePower = getOption(slash, "power");
 
+        if (a.isEmpty())
+            a = Registration.register(slash.getUser(), slash.getGuild(), cluster);
+
+        if (b.isEmpty())
+            b = Registration.register(u.get(), slash.getGuild(), cluster);
+
         if (a.isPresent() && b.isPresent()) {
-            boolean activate = true;
-            if (activePower.isPresent())
-                activate = GameAction.execute(
-                        EventRequest.of(
-                                Request.ACTIVATE,
-                                new Param("action", Request.TAKE),
-                                new Param("a", a.get()),
-                                new Param("power", activePower.get()),
-                                new Param("cluster", cluster)
-                        )
-                ).valueNoOptional("activate");
+            boolean activate = GameAction.execute(
+                    EventRequest.of(
+                            Request.ACTIVATE,
+                            new Param("a", a.get()),
+                            new Param("power", Power.valueOf(activePower.orElse("NULL"))),
+                            new Param("cluster", cluster)
+                    )
+            ).valueNoOptional("activate");
+
 
             if (activate) {
                 EventResponse event = GameAction.execute(
@@ -77,9 +77,9 @@ public class ThrowCommand extends CommandAbstract {
 
                 replySlash(slash, event, a.get(), b.get());
             } else
-                replyNon(slash);
+                replyActivate(slash, lang(slash));
         } else
-            replyError(slash);
+            replyError(slash, lang(slash));
     }
 
     private void replySlash(SlashCommandInteractionEvent slash, EventResponse event, Player a, Player b) {

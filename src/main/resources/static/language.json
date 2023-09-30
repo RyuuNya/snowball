@@ -42,6 +42,11 @@
       "ru" : "Получил следующую силу - ",
       "en" : "Got the following power - "
     },
+    {
+      "name" : "ACTIVATE",
+      "ru" : "Хмм, я не нашел в вашем инвентаре такую силу",
+      "en" : "Hmm, I didn't find that power in your inventory"
+    },
 
     {
       "name" : "NULL",
@@ -150,6 +155,11 @@
       "name" : "SERVER_RESET",
       "ru" : "Пользовательские данные были сброшены",
       "en" : "User data has been reset"
+    },
+    {
+      "name" : "ERROR",
+      "ru" : "Ой, произошла непредвиденная ошибка",
+      "en" : "Oops, there's been an unforeseen error"
     }
   ]
 }
